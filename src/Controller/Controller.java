@@ -21,16 +21,12 @@ public class Controller {
     }
 
     public void addTableArea(){
-        List<TableArea> tableAreaList = window.getTableAreaList();
+        JTabbedPane tabbedPane = window.getTabbedPane();
         TableArea tableArea = new TableArea(window);
-        tableAreaList.add(tableArea);
-        JButton tab = tableArea.getTab();
-        JToolBar toolBar = window.getToolBar();
-        toolBar.add(tab);
-        repaintToolBar();
+        tabbedPane.addTab("New Hall", tableArea);
     }
 
-    private void repaintToolBar(){
+    /*private void repaintToolBar(){
         JToolBar toolBar = window.getToolBar();
         List<TableArea> tableAreaList = window.getTableAreaList();
         toolBar.removeAll();
@@ -41,7 +37,7 @@ public class Controller {
         }
         window.createButtonPlus();
         toolBar.repaint();
-    }
+    }*/
 
     public void addTable(MouseEvent e){
         int xCoord = e.getX();
@@ -94,10 +90,10 @@ public class Controller {
         repaintTableArea(tableArea);
     }
 
-    public void switchTab(TableArea tableArea){
+    /*public void switchTab(TableArea tableArea){
         window.setCurrentTableArea(tableArea);
         window.getPanel().updateUI();
-    }
+    }*/
 
     public void closeTableArea(TableArea tableArea){
         List<TableArea> tableAreaList = window.getTableAreaList();
@@ -109,10 +105,10 @@ public class Controller {
                     nextTableArea = tableAreaIterator;
                 }
             }
-            switchTab(nextTableArea);
+            //switchTab(nextTableArea);
         }
         tableAreaList.remove(tableArea);
-        repaintToolBar();
+        //repaintToolBar();
     }
 
     private void repaintTableArea(TableArea tableArea){

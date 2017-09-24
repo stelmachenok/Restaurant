@@ -18,32 +18,32 @@ public class TableArea extends JComponent {
     private JButton closeButton;
     private TableBase tables;
 
-    static final Font TAB_HEADER_FONT = new Font("Console", Font.BOLD, 20);
     static final private Color CLOSE_BUTTON_COLOR = new Color(228, 96, 96);
     static final private Color CHAIRS_COLOR = Color.WHITE;
     static final private Color SHADOW_COLOR = Color.GRAY;
-    static final private Color TABLES_COLOR = Color.BLACK;
-    static final private Color SELECTED_COLOR = Color.GREEN;
+    static final private Color TABLES_COLOR = new Color(0x37B776);
+    static final private Color SELECTED_COLOR = new Color(0x00FF28);
 
     public TableArea(Window window){
         this.window = window;
         this.controller = this.window.getController();
         tables = new TableBase();
-        createButtons();
+        addTableAreaListeners();
+        //createButtons();
         //repaint();
     }
 
-    private void createButtons(){
+    /*private void createButtons(){
         int numberOfTabs = this.window.getTableAreaList().size();
         tab = new JButton("New Hall " + (numberOfTabs + 1));
         tab.setFont(TAB_HEADER_FONT);
         addTabListener();
-        addTableAreaListeners();
+
         closeButton = new JButton("X");
         closeButton.setFont(TAB_HEADER_FONT);
         closeButton.setBackground(CLOSE_BUTTON_COLOR);
         addCloseButtonListener();
-    }
+    }*/
 
     @Override
     protected void paintComponent(Graphics g){
@@ -108,14 +108,14 @@ public class TableArea extends JComponent {
 
     }
 
-    private void addTabListener(){
+    /*private void addTabListener(){
         tab.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 controller.switchTab(TableArea.this);
             }
         });
-    }
+    }*/
 
     private void addCloseButtonListener(){
         closeButton.addActionListener(new ActionListener() {
