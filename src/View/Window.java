@@ -1,21 +1,20 @@
 package View;
 
 import Controller.Controller;
-
+import Model.Table;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.List;
 
 /**
  * Created by y50-70 on 14.09.2017.
  */
 public class Window {
+    private JFrame frame;
     private JPanel panel;
+    private DishPanel dishPanel;
     private JToolBar toolBar;
     private JPanel editToolBar;
-    private List<TableArea> tableAreaList;
-    private TableArea currentTableArea;
     private Controller controller;
     private JTabbedPane tabbedPane;
     private JTextField hallNameTextField;
@@ -23,15 +22,23 @@ public class Window {
     private JButton editButton;
     private JButton exitButton;
     private JButton readyButton;
+    private boolean isEditModeOn;
 
-    static final private Font TAB_AND_BUTTON_FONT = new Font("Console", Font.BOLD, 20);
+    static final Dimension DIMENSION = new Dimension(1920, 1030);
+    static final Font TAB_AND_BUTTON_FONT = new Font("Console", Font.BOLD, 20);
 
     private Window(){
         createFrame();
         createController();
+        createEditToolBar();
         createTabbedPane();
         createToolBar();
-        createEditToolBar();
+        createDishPanel();
+        panel.updateUI();
+    }
+
+    private void createDishPanel(){
+        dishPanel = new DishPanel();
     }
 
     private void createController() {
@@ -39,10 +46,10 @@ public class Window {
     }
 
     private void createFrame(){
-        JFrame frame = new JFrame("Restaurant");
+        frame = new JFrame("Restaurant");
         panel = new JPanel(new BorderLayout());
         frame.add(panel);
-        frame.setSize(1920, 1030);
+        frame.setSize(DIMENSION);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
@@ -54,6 +61,10 @@ public class Window {
         createReadyButton();
         panel.add(toolBar, BorderLayout.NORTH);
 
+    }
+
+    public JTextField getTableNameTextField() {
+        return tableNameTextField;
     }
 
     private void createEditToolBar(){
@@ -77,11 +88,20 @@ public class Window {
 
         hallNameTextField = new JTextField(10);
         hallNameTextField.setFont(TAB_AND_BUTTON_FONT);
+        hallNameTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), hallNameTextField.getText());
+            }
+        });
         c.gridy++;
         editToolBar.add(hallNameTextField, c);
 
         button = new JButton("Удалить");
         button.setFont(TAB_AND_BUTTON_FONT);
+        button.addActionListener(e -> {
+            tabbedPane.removeTabAt(tabbedPane.getSelectedIndex());
+        });
         c.gridy++;
         editToolBar.add(button,c);
 
@@ -93,85 +113,79 @@ public class Window {
 
         button = new JButton("Добавить");
         button.setFont(TAB_AND_BUTTON_FONT);
+        button.addActionListener(e -> {
+            controller.addTable((int)(DIMENSION.getWidth()/2), (int)(DIMENSION.getHeight()/2));
+        });
         c.gridy++;
         editToolBar.add(button,c);
 
         tableNameTextField = new JTextField(10);
         tableNameTextField.setFont(TAB_AND_BUTTON_FONT);
+        tableNameTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+            Table table = getCurrentTableArea().getSelectedTable();
+            if (table != null){
+                table.setTableName(tableNameTextField.getText());
+            }
+            tabbedPane.repaint();
+            }
+        });
         c.gridy++;
         editToolBar.add(tableNameTextField, c);
 
         button = new JButton("Удалить");
         button.setFont(TAB_AND_BUTTON_FONT);
+        button.addActionListener(e -> {
+            controller.removeTable();
+        });
         c.gridy++;
         editToolBar.add(button,c);
 
         panel.add(editToolBar, BorderLayout.EAST);
-        panel.updateUI();
     }
 
     private void createTabbedPane(){
         tabbedPane = new JTabbedPane();
         tabbedPane.setFont(TAB_AND_BUTTON_FONT);
         tabbedPane.addTab("New Hall", new TableArea(this));
+        tabbedPane.addChangeListener(e ->
+        {
+            hallNameTextField.setText(tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()));
+        });
         panel.add(tabbedPane, BorderLayout.CENTER);
-        /*tableAreaList = new ArrayList<>();
-        currentTableArea = new TableArea(this);
-        tableAreaList.add(currentTableArea);
-        panel.add(currentTableArea, BorderLayout.CENTER);*/
-    }
-
-    public JToolBar getToolBar() {
-        return toolBar;
-    }
-
-    public List<TableArea> getTableAreaList() {
-        return tableAreaList;
     }
 
     Controller getController() {
         return controller;
     }
 
-    public TableArea getCurrentTableArea() {
-        return (TableArea)tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
-    }
-
     public JPanel getPanel() {
         return panel;
     }
 
-    /*public void setCurrentTableArea(TableArea tableArea) {
-        panel.remove(currentTableArea);
-        currentTableArea = tableArea;
-        panel.add(currentTableArea, BorderLayout.CENTER);
-    }*/
+    public JFrame getFrame() {
+        return frame;
+    }
 
-    /*public void createButtonPlus(){
-        JButton button = new JButton("+");
-        button.setFont(TAB_AND_BUTTON_FONT);
-        button.setSize(500,500);
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.addTableArea();
-            }
-        });
-        toolBar.add(button);
-    }*/
+    public DishPanel getDishPanel() {
+        return dishPanel;
+    }
+
+    public TableArea getCurrentTableArea() {
+        return (TableArea)tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
+    }
 
     private void createEditButton(){
         editButton = new JButton("Редактировать");
         editButton.setFont(TAB_AND_BUTTON_FONT);
-        editButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                toolBar.removeAll();
-                toolBar.add(readyButton);
-                editToolBar.setVisible(true);
-                String tabHeader = tabbedPane.getTitleAt(tabbedPane.getSelectedIndex());
-                hallNameTextField.setText(tabHeader);
-            }
+        editButton.addActionListener(e -> {
+            toolBar.removeAll();
+            toolBar.add(readyButton);
+            editToolBar.setVisible(true);
+            String tabHeader = tabbedPane.getTitleAt(tabbedPane.getSelectedIndex());
+            hallNameTextField.setText(tabHeader);
+            isEditModeOn = true;
         });
         toolBar.add(editButton);
     }
@@ -179,25 +193,25 @@ public class Window {
     private void createReadyButton(){
         readyButton = new JButton("Готово");
         readyButton.setFont(TAB_AND_BUTTON_FONT);
-        readyButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                toolBar.removeAll();
-                toolBar.add(editButton);
-                toolBar.add(exitButton);
-                editToolBar.setVisible(false);
-            }
+        readyButton.addActionListener(e -> {
+            toolBar.removeAll();
+            toolBar.add(editButton);
+            toolBar.add(exitButton);
+            editToolBar.setVisible(false);
+            isEditModeOn = false;
         });
+
+    }
+
+    boolean isEditModeOn() {
+        return isEditModeOn;
     }
 
     private void createExitButton(){
         exitButton = new JButton("Выйти");
         exitButton.setFont(TAB_AND_BUTTON_FONT);
-        exitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        exitButton.addActionListener(e -> {
 
-            }
         });
         toolBar.add(exitButton);
     }

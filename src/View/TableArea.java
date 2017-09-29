@@ -14,11 +14,9 @@ import java.awt.event.*;
 public class TableArea extends JComponent {
     private Window window;
     private Controller controller;
-    private JButton tab;
-    private JButton closeButton;
     private TableBase tables;
 
-    static final private Color CLOSE_BUTTON_COLOR = new Color(228, 96, 96);
+    //static final private Color CLOSE_BUTTON_COLOR = new Color(228, 96, 96);
     static final private Color CHAIRS_COLOR = Color.WHITE;
     static final private Color SHADOW_COLOR = Color.GRAY;
     static final private Color TABLES_COLOR = new Color(0x37B776);
@@ -29,27 +27,12 @@ public class TableArea extends JComponent {
         this.controller = this.window.getController();
         tables = new TableBase();
         addTableAreaListeners();
-        //createButtons();
-        //repaint();
     }
-
-    /*private void createButtons(){
-        int numberOfTabs = this.window.getTableAreaList().size();
-        tab = new JButton("New Hall " + (numberOfTabs + 1));
-        tab.setFont(TAB_HEADER_FONT);
-        addTabListener();
-
-        closeButton = new JButton("X");
-        closeButton.setFont(TAB_HEADER_FONT);
-        closeButton.setBackground(CLOSE_BUTTON_COLOR);
-        addCloseButtonListener();
-    }*/
 
     @Override
     protected void paintComponent(Graphics g){
         g.setColor(Color.LIGHT_GRAY);
         g.fillRect(0,0,2000,2000);
-        //TableBase tables = window.getController().getTableBase();
         int size = tables.size();
         for(int i = 0; i < size; i++){
             Table table = tables.getTable(i);
@@ -85,53 +68,47 @@ public class TableArea extends JComponent {
             g.setColor(TABLES_COLOR);
         }
         g.fillRoundRect(xCoord - Table.WIDTH, yCoord - Table.LENGTH, Table.WIDTH * 2, Table.LENGTH*2, 15, 15);
+        g.setColor(Color.BLACK);
+        g.drawString(table.getTableName(), xCoord - Table.WIDTH, yCoord - Table.LENGTH + 20);
+    }
+
+    public Table getSelectedTable(){
+        Table selectedTable = null;
+        int size = tables.size();
+        for(int i = 0; i < size; i++) {
+            Table table = tables.getTable(i);
+            if (table.isSelected()) {
+                selectedTable = tables.getTable(i);
+            }
+        }
+        return selectedTable;
     }
 
     private void addTableAreaListeners(){
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(e.getClickCount() == 2){
-                    controller.addTable(e);
-                }
-                else {
-                    controller.selectTable(e);
+            if (window.isEditModeOn()) {
+                if (e.getClickCount() == 2) {
+                    controller.addTableWithMouse(e);
+                } else {
+                    controller.selectTableOnEditMode(e);
                 }
             }
+            else{
+                controller.selectTableOnSimpleMode(e);
+            }
+            }
         });
+
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                controller.moveTable(e);
+                if (window.isEditModeOn()) {
+                    controller.moveTable(e);
+                }
             }
         });
-
-    }
-
-    /*private void addTabListener(){
-        tab.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.switchTab(TableArea.this);
-            }
-        });
-    }*/
-
-    private void addCloseButtonListener(){
-        closeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.closeTableArea(TableArea.this);
-            }
-        });
-    }
-
-    public JButton getTab() {
-        return tab;
-    }
-
-    public JButton getCloseButton() {
-        return closeButton;
     }
 
     public TableBase getTables() {

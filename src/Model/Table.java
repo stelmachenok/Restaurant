@@ -1,17 +1,14 @@
 package Model;
 
-import java.awt.geom.RoundRectangle2D;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by y50-70 on 02.09.2017.
  */
 public class Table {
-    DishBase dishes;
-    int xCoord;
-    int yCoord;
-    boolean isSelect = false;
+    private DishBase dishes;
+    private String tableName;
+    private int xCoord;
+    private int yCoord;
+    private boolean isSelect = false;
     public static final int WIDTH = 50;
     public static final int LENGTH = 50;
 
@@ -36,6 +33,10 @@ public class Table {
         return yCoord;
     }
 
+    public String getTableName() {
+        return tableName;
+    }
+
     public boolean isSelected(){
         return isSelect;
     }
@@ -50,6 +51,10 @@ public class Table {
 
     public void setyCoord(int yCoord) {
         this.yCoord = yCoord;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 
     public DishBase getDishes() {
