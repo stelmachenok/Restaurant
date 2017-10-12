@@ -1,7 +1,5 @@
 package Model;
 
-import javafx.scene.control.Tab;
-
 import java.util.ArrayList;
 import java.util.List;
 

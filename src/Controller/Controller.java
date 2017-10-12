@@ -16,53 +16,44 @@ import java.awt.event.MouseEvent;
 public class Controller {
     private Window window;
 
-
     public Controller(Window window){
         this.window = window;
     }
 
-    public void addTableArea(){
-        JTabbedPane tabbedPane = window.getTabbedPane();
-        TableArea tableArea = new TableArea(window);
-        tabbedPane.addTab("New Hall", tableArea);
-    }
+//    public void addTableArea(){
+//        JTabbedPane tabbedPane = window.getTabbedPane();
+//        TableArea tableArea = new TableArea(window);
+//        tabbedPane.addTab("New Hall", tableArea);
+//    }
 
-    /*private void repaintToolBar(){
-        JToolBar toolBar = window.getToolBar();
-        List<TableArea> tableAreaList = window.getTableAreaList();
-        toolBar.removeAll();
-        for (TableArea tableArea: tableAreaList) {
-            toolBar.add(tableArea.getTab());
-            toolBar.add(tableArea.getCloseButton());
+//    public void addTable(int xCoord, int yCoord){
+//        Table table = new Table(xCoord, yCoord);
+//        TableArea tableArea = window.getCurrentTableArea();
+//        TableBase tableBase = tableArea.getTables();
+//        table.setTableName("Стол " + (tableBase.size() + 1));
+//        tableBase.addTable(table);
+//        repaintTableArea(tableArea);
+//    }
 
-        }
-        window.createButtonPlus();
-        toolBar.repaint();
-    }*/
-
-    public void addTable(int xCoord, int yCoord){
+    public void addTableWithMouse(MouseEvent e){
+        int xCoord = e.getX();
+        int yCoord = e.getY();
         Table table = new Table(xCoord, yCoord);
         TableArea tableArea = window.getCurrentTableArea();
         TableBase tableBase = tableArea.getTables();
         table.setTableName("Стол " + (tableBase.size() + 1));
         tableBase.addTable(table);
-        repaintTableArea(tableArea);
+        tableArea.repaint();
     }
 
-    public void addTableWithMouse(MouseEvent e){
-        int xCoord = e.getX();
-        int yCoord = e.getY();
-        addTable(xCoord, yCoord);
-    }
-
-    public void removeTable(){
-        TableArea tableArea = window.getCurrentTableArea();
-        Table table  = tableArea.getSelectedTable();
-        if (table != null){
-            tableArea.getTables().removeTable(table);
-        }
-        repaintTableArea(tableArea);
-    }
+//    public void removeTable(){
+//        TableArea tableArea = window.getCurrentTableArea();
+//        Table table  = tableArea.getSelectedTable();
+//        if (table != null){
+//            tableArea.getTables().removeTable(table);
+//        }
+//        repaintTableArea(tableArea);
+//    }
 
     private Table getSelectedTable(int xCoord, int yCoord){
         TableArea tableArea = window.getCurrentTableArea();
@@ -97,7 +88,7 @@ public class Controller {
         else{
             window.getTableNameTextField().setText("");
         }
-        repaintTableArea(tableArea);
+        tableArea.repaint();
     }
 
     public void selectTableOnSimpleMode(MouseEvent e){
@@ -107,11 +98,34 @@ public class Controller {
         if (selectedTable != null){
             DishPanel dishPanel = window.getDishPanel();
             JPanel panel = window.getPanel();
-            //dishPanel.setVisible(true);
             window.getFrame().remove(panel);
             window.getFrame().add(dishPanel);
             dishPanel.updateUI();
         }
+    }
+
+//    public GridBagConstraints initGridBagConstraints(int gridheight, int gridwidth){
+//        GridBagConstraints c = new GridBagConstraints();
+//        c.anchor = GridBagConstraints.CENTER;
+//        c.fill   = GridBagConstraints.CENTER;
+//        c.gridheight = gridheight;
+//        c.gridwidth  = gridheight;
+//        c.gridx = 0;
+//        c.gridy = 0;
+//        c.insets = new Insets(10, 0, 0, 0);
+//        c.ipadx = 1;
+//        c.ipady = 1;
+//        c.weightx = 0.0;
+//        c.weighty = 0.0;
+//        return c;
+//    }
+
+    public void backToSimpleMode(){
+        JPanel panel = window.getPanel();
+        DishPanel dishPanel = window.getDishPanel();
+        window.getFrame().remove(dishPanel);
+        window.getFrame().add(panel);
+        panel.updateUI();
     }
 
     public void moveTable(MouseEvent e){
@@ -127,31 +141,10 @@ public class Controller {
                 currentTable.setyCoord(yCoord);
             }
         }
-        repaintTableArea(tableArea);
-    }
-
-    /*public void switchTab(TableArea tableArea){
-        window.setCurrentTableArea(tableArea);
-        window.getPanel().updateUI();
-    }*/
-
-    /*public void closeTableArea(TableArea tableArea){
-        List<TableArea> tableAreaList = window.getTableAreaList();
-        TableArea currentTableArea = window.getCurrentTableArea();
-        if(tableArea.equals(currentTableArea)){
-            TableArea nextTableArea = null;
-            for (TableArea tableAreaIterator:tableAreaList) {
-                if (!tableAreaIterator.equals(currentTableArea)){
-                    nextTableArea = tableAreaIterator;
-                }
-            }
-            //switchTab(nextTableArea);
-        }
-        tableAreaList.remove(tableArea);
-        //repaintToolBar();
-    }*/
-
-    private void repaintTableArea(TableArea tableArea){
         tableArea.repaint();
     }
+
+//    private void repaintTableArea(TableArea tableArea){
+//        tableArea.repaint();
+//    }
 }
