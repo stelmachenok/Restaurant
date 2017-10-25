@@ -1,10 +1,9 @@
 package View;
 
 import Controller.Controller;
-import Model.Table;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 /**
  * Created by y50-70 on 14.09.2017.
@@ -31,7 +30,7 @@ public class Window {
         createFrame();
         createController();
         createTabbedPane();
-        createEditToolBar();
+        createEditPanel();
         createToolBar();
         createDishPanel();
         panel.updateUI();
@@ -67,86 +66,8 @@ public class Window {
         return tableEditPanel.getTableNameTextField();
     }
 
-    private void createEditToolBar(){
+    private void createEditPanel(){
         tableEditPanel = new TableEditPanel(this, tabbedPane);
-
-//        editToolBar = new JPanel(new GridBagLayout());
-//        editToolBar.setVisible(false);
-//        GridBagConstraints c = controller.initGridBagConstraints(1,8);
-//
-//        JLabel label = new JLabel("<html><u>Зал</u></html>");
-//        label.setForeground(new Color(225,0, 25));
-//        label.setFont(TAB_AND_BUTTON_FONT);
-//        editToolBar.add(label, c);
-//
-//        JButton button;
-//        button = new JButton("Добавить");
-//        button.addActionListener(e -> {
-//            controller.addTableArea();
-//        });
-//        button.setFont(TAB_AND_BUTTON_FONT);
-//        c.gridy++;
-//        editToolBar.add(button,c);
-//
-//        hallNameTextField = new JTextField(10);
-//        hallNameTextField.setFont(TAB_AND_BUTTON_FONT);
-//        hallNameTextField.addKeyListener(new KeyAdapter() {
-//            @Override
-//            public void keyReleased(KeyEvent e) {
-//                if (tabbedPane.getTabCount() > 0) {
-//                    tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), hallNameTextField.getText());
-//                }
-//            }
-//        });
-//        c.gridy++;
-//        editToolBar.add(hallNameTextField, c);
-//
-//        button = new JButton("Удалить");
-//        button.setFont(TAB_AND_BUTTON_FONT);
-//        button.addActionListener(e -> {
-//            if (tabbedPane.getTabCount() > 0)
-//                tabbedPane.removeTabAt(tabbedPane.getSelectedIndex());
-//        });
-//        c.gridy++;
-//        editToolBar.add(button,c);
-//
-//        label = new JLabel("<html><u>Стол</u></html>");
-//        label.setForeground(new Color(225,0, 25));
-//        label.setFont(TAB_AND_BUTTON_FONT);
-//        c.gridy++;
-//        editToolBar.add(label, c);
-//
-//        button = new JButton("Добавить");
-//        button.setFont(TAB_AND_BUTTON_FONT);
-//        button.addActionListener(e -> {
-//            controller.addTable((int)(DIMENSION.getWidth()/2), (int)(DIMENSION.getHeight()/2));
-//        });
-//        c.gridy++;
-//        editToolBar.add(button,c);
-//
-//        tableNameTextField = new JTextField(10);
-//        tableNameTextField.setFont(TAB_AND_BUTTON_FONT);
-//        tableNameTextField.addKeyListener(new KeyAdapter() {
-//            @Override
-//            public void keyReleased(KeyEvent e) {
-//            Table table = getCurrentTableArea().getSelectedTable();
-//            if (table != null){
-//                table.setTableName(tableNameTextField.getText());
-//            }
-//            tabbedPane.repaint();
-//            }
-//        });
-//        c.gridy++;
-//        editToolBar.add(tableNameTextField, c);
-//
-//        button = new JButton("Удалить");
-//        button.setFont(TAB_AND_BUTTON_FONT);
-//        button.addActionListener(e -> {
-//            controller.removeTable();
-//        });
-//        c.gridy++;
-//        editToolBar.add(button,c);
-
         panel.add(tableEditPanel, BorderLayout.EAST);
     }
 

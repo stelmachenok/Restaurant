@@ -15,28 +15,49 @@ import static View.Window.*;
 public class DishEditPanel extends AbstractEditPanel {
     private JTextField typeTextField;
     private JTextField subTypeTextField;
-    private JTextField dishTextField;
-    private JTabbedPane dishTabbedPane;
+    private JTextField dishNameTextField;
+    private JTextField dishPriceTextField;
+//    private JTabbedPane dishTabbedPane;
     private DishEditController controller;
+    private DishPanel dishPanel;
 
-    void setDishTabbedPane(JTabbedPane dishTabbedPane) {
-        this.dishTabbedPane = dishTabbedPane;
+    public DishEditController getController() {
+        return controller;
     }
 
-    JTextField getTypeTextField() {
+    public JTextField getTypeTextField() {
         return typeTextField;
     }
 
-    JTextField getSubTypeTextField() {
+    public JTextField getSubTypeTextField() {
         return subTypeTextField;
     }
 
-    public JTextField getDishTextField() {
-        return dishTextField;
+    public JTextField getDishNameTextField() {
+        return dishNameTextField;
     }
 
-    DishEditPanel() {
-        super(1, 11);
+    public JTextField getDishPriceTextField() {
+        return dishPriceTextField;
+    }
+
+//    public JTextField getDishTextField() {
+//        return dishTextField;
+//    }
+
+    DishEditPanel(DishPanel dishPanel) {
+        super(1, 15);
+        this.dishPanel = dishPanel;
+//        this.dishTabbedPane = dishTabbedPane;
+        controller = new DishEditController(dishPanel, this);
+        this.dishPanel.addListener(new DishPanelListener() {
+            @Override
+            public void tableChanged() {
+
+                controller.refreshEditPaneFields();
+            }
+        });
+
         JLabel label = new JLabel("<html><u>Раздел</u></html>");
         label.setForeground(new Color(225, 0, 25));
         label.setFont(TAB_AND_BUTTON_FONT);
@@ -46,6 +67,7 @@ public class DishEditPanel extends AbstractEditPanel {
         JButton button;
         button = new JButton("Добавить");
         button.addActionListener(e -> {
+            controller.addType();
         });
         button.setFont(TAB_AND_BUTTON_FONT);
         add(button, constraints);
@@ -56,10 +78,7 @@ public class DishEditPanel extends AbstractEditPanel {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                if (dishTabbedPane.getTabCount() > 0) {
-                    String newTitle = typeTextField.getText();
-                    dishTabbedPane.setTitleAt(dishTabbedPane.getSelectedIndex(), newTitle);
-                }
+                controller.changeTypeName();
             }
         });
         typeTextField.setFont(TAB_AND_BUTTON_FONT);
@@ -68,9 +87,7 @@ public class DishEditPanel extends AbstractEditPanel {
 
         button = new JButton("Удалить");
         button.addActionListener(e -> {
-            if (dishTabbedPane.getTabCount() > 0) {
-                dishTabbedPane.removeTabAt(dishTabbedPane.getSelectedIndex());
-            }
+            controller.removeType();
         });
         button.setFont(TAB_AND_BUTTON_FONT);
         add(button, constraints);
@@ -84,6 +101,7 @@ public class DishEditPanel extends AbstractEditPanel {
 
         button = new JButton("Добавить");
         button.addActionListener(e -> {
+            controller.addSubType();
         });
         button.setFont(TAB_AND_BUTTON_FONT);
         add(button, constraints);
@@ -93,14 +111,7 @@ public class DishEditPanel extends AbstractEditPanel {
         subTypeTextField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if (dishTabbedPane.getTabCount() > 0) {
-                    String tabHeader = dishTabbedPane.getTitleAt(dishTabbedPane.getSelectedIndex());
-                    typeTextField.setText(tabHeader);
-                    JTabbedPane tab = (JTabbedPane) dishTabbedPane.getComponentAt(dishTabbedPane.getSelectedIndex());
-                    if (tab != null) {
-                        tab.setTitleAt(tab.getSelectedIndex(), subTypeTextField.getText());
-                    }
-                }
+                controller.changeSubTypeName();
             }
         });
         subTypeTextField.setFont(TAB_AND_BUTTON_FONT);
@@ -109,11 +120,7 @@ public class DishEditPanel extends AbstractEditPanel {
 
         button = new JButton("Удалить");
         button.addActionListener(e -> {
-//            String title = dishTabbedPane.getTitleAt(dishTabbedPane.getSelectedIndex());
-//            JTabbedPane tab = subTypeDishMap.get(title);
-//            if (tab.getTabCount() > 0) {
-//                tab.removeTabAt(tab.getSelectedIndex());
-//            }
+            controller.removeSubType();
         });
         button.setFont(TAB_AND_BUTTON_FONT);
         add(button, constraints);
@@ -127,21 +134,49 @@ public class DishEditPanel extends AbstractEditPanel {
 
         button = new JButton("Добавить");
         button.addActionListener(e -> {
+            controller.addDish();
         });
+
         button.setFont(TAB_AND_BUTTON_FONT);
         add(button, constraints);
         constraints.gridy++;
 
-        dishTextField = new JTextField(10);
-        dishTextField.addKeyListener(new KeyAdapter() {
+        label = new JLabel("<html><u>Название</u></html>");
+        label.setForeground(new Color(0, 0, 0));
+        label.setFont(TAB_AND_BUTTON_FONT);
+        add(label, constraints);
+        constraints.gridy++;
+
+        dishNameTextField = new JTextField(10);
+        dishNameTextField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-
+                controller.changeDishName();
             }
         });
-        dishTextField.setFont(TAB_AND_BUTTON_FONT);
-        add(dishTextField, constraints);
+        dishNameTextField.setFont(TAB_AND_BUTTON_FONT);
+        add(dishNameTextField, constraints);
         constraints.gridy++;
+
+        label = new JLabel("<html><u>Цена</u></html>");
+        label.setForeground(new Color(0, 0, 0));
+        label.setFont(TAB_AND_BUTTON_FONT);
+        add(label, constraints);
+        constraints.gridy++;
+
+        dishPriceTextField = new JTextField(10);
+        dishPriceTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                controller.changeDishPrice();
+                //dishTabbedPane.updateUI();
+            }
+        });
+        dishPriceTextField.setFont(TAB_AND_BUTTON_FONT);
+        add(dishPriceTextField, constraints);
+        constraints.gridy++;
+
+
 
         button = new JButton("Удалить");
         button.addActionListener(e -> {

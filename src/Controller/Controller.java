@@ -120,13 +120,13 @@ public class Controller {
 //        return c;
 //    }
 
-    public void backToSimpleMode(){
-        JPanel panel = window.getPanel();
-        DishPanel dishPanel = window.getDishPanel();
-        window.getFrame().remove(dishPanel);
-        window.getFrame().add(panel);
-        panel.updateUI();
-    }
+//    public void backToSimpleMode(){
+//        JPanel panel = window.getPanel();
+//        DishPanel dishPanel = window.getDishPanel();
+//        window.getFrame().remove(dishPanel);
+//        window.getFrame().add(panel);
+//        panel.updateUI();
+//    }
 
     public void moveTable(MouseEvent e){
         int xCoord = e.getX();

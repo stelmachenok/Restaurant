@@ -1,9 +1,11 @@
 package View;
 
-import Controller.Controller;
+import Controller.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static View.Window.DIMENSION;
 import static View.Window.TAB_AND_BUTTON_FONT;
@@ -13,7 +15,7 @@ import static View.Window.TAB_AND_BUTTON_FONT;
  */
 public class DishPanel extends JPanel{
     private Window window;
-    private Controller controller;
+    private DishPanelController controller;
     private JToolBar toolBar;
     private JTabbedPane tabbedPane;
     private DishEditPanel editDishPanel;
@@ -21,38 +23,114 @@ public class DishPanel extends JPanel{
     private JButton editButton;
     private JButton closeButton;
     private JButton readyButton;
+    private List<DishPanelListener> listeners;
+
+    public DishPanelController getController() {
+        return controller;
+    }
+
+    public JTabbedPane getTabbedPane() {
+        return tabbedPane;
+    }
+
+    public DishEditPanel getEditDishPanel() {
+        return editDishPanel;
+    }
 
     DishPanel(Window window){
         super(new BorderLayout());
         this.window = window;
-        controller = this.window.getController();
+        this.listeners = new ArrayList<>();
         createPanel();
+        createController();
         createToolBar();
         createTabbedPane();
-        createSubTypeTabbedPane();
         createEditPanel();
+        createSubTypeTabbedPane();
+    }
+
+    private void createController(){
+        controller = new DishPanelController(this, window);
     }
 
     private void createEditPanel(){
-
-        editDishPanel = new DishEditPanel();
-        editDishPanel.setDishTabbedPane(tabbedPane);
-
+        editDishPanel = new DishEditPanel(this);
         add(editDishPanel, BorderLayout.EAST);
     }
 
     private void createSubTypeTabbedPane() {
-        JTabbedPane tabbedPane = new JTabbedPane();
+        controller.fillingDishList();
+//        JTabbedPane tabbedPane = new JTabbedPane();
+//        tabbedPane.addChangeListener(e -> {
+//            controller.refreshEditPaneFields();
+//        });
+//        tabbedPane.addTab("Алкогольные", new JPanel(new GridBagLayout()));
+//
+//        List<Dish> dishes = new ArrayList<>();
+//        Dish dish = new Dish("Espresso", 15);
+//        Dish dish1 = new Dish("Capuccino", 15);
+//        Dish dish2 = new Dish("Macaccino", 15);
+//        Dish dish3 = new Dish("Italiano", 15);
+//        dishes.add(dish);
+//        dish.setVisible(true);
+//        dishes.add(dish1);
+//        dish1.setVisible(true);
+//        dishes.add(dish2);
+//        dish2.setVisible(true);
+//        dishes.add(dish3);
+//        dish3.setVisible(true);
+//
+//        JPanel hotPanel = new JPanel(new GridBagLayout());
+//        hotPanel.setVisible(true);
+//
+//        GridBagConstraints constraints;
+//
+//        constraints = new GridBagConstraints();
+//        constraints.anchor = GridBagConstraints.NORTH;
+//        constraints.fill = GridBagConstraints.PAGE_START;
+//        constraints.gridheight = 1;
+//        constraints.gridwidth = 5;
+//        constraints.gridx = GridBagConstraints.RELATIVE;
+//        constraints.gridy = 0;
+//        constraints.insets = new Insets(10, 5, 0, 5);
+//        constraints.ipadx = 1;
+//        constraints.ipady = 1;
+//        constraints.weightx = 100;
+//        constraints.weighty = 1;
+//
+//
+//        tabbedPane.addTab("Горячие", hotPanel);
+//        this.tabbedPane.add("Напитки", tabbedPane);
+//
+//        for (Dish currentDish:dishes) {
+//            hotPanel.add(currentDish, constraints);
+////            constraints.weightx += 100;
+//            currentDish.addMouseListener(new MouseAdapter() {
+//                @Override
+//                public void mouseClicked(MouseEvent e) {
+//                    controller.
+//                    editDishPanel.getController().
+//                }
+//            });
+//        }
+//
+//        JTabbedPane foodTabbedPane = new JTabbedPane();
+//        foodTabbedPane.addChangeListener(e -> {
+//            controller.refreshEditPaneFields();
+//        });
+//        this.tabbedPane.add("Еда", foodTabbedPane);
 
-        tabbedPane.addTab("Алкогольные", new JPanel());
-        tabbedPane.addTab("Горячие", new JPanel());
-        this.tabbedPane.add("Напитки", tabbedPane);
-        tabbedPane.addTab("Еда", new JPanel(new BorderLayout()));
     }
 
     private void createTabbedPane() {
         tabbedPane = new JTabbedPane();
         tabbedPane.setFont(TAB_AND_BUTTON_FONT);
+        tabbedPane.addChangeListener(e -> {
+            controller.refreshEditPaneFields();
+            for(DishPanelListener l: listeners){
+                l.tableChanged();
+            }
+        });
         add(tabbedPane, BorderLayout.CENTER);
     }
 
@@ -82,7 +160,7 @@ public class DishPanel extends JPanel{
                 JTabbedPane tab = (JTabbedPane) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
 //                JTabbedPane tab = tabbedPane.getComponentAt(tabbedPane.getSelectedIndex()).get(tabHeader);
                 if (tab != null) {
-                    String subTypeHeader = tab.getTitleAt(tab.getSelectedIndex());
+                    String subTypeHeader = tab.getTitleAt(tab.getSelectedIndex()); //todo validation codname "bread"
                     editDishPanel.getSubTypeTextField().setText(subTypeHeader);
                 }
                 else {
@@ -115,5 +193,9 @@ public class DishPanel extends JPanel{
             isEditModeOn = false;
             editDishPanel.setVisible(false);
         });
+    }
+
+    public void addListener(DishPanelListener dishPanelListener) {
+        this.listeners.add(dishPanelListener);
     }
 }
