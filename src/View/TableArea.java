@@ -1,12 +1,14 @@
 package View;
 
 import Model.Table;
-import Model.TableBase;
+import Model.Point;
 import Controller.Controller;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by y50-70 on 15.09.2017.
@@ -14,18 +16,20 @@ import java.awt.event.*;
 public class TableArea extends JComponent {
     private Window window;
     private Controller controller;
-    private TableBase tables;
+    private UUID id;
 
     //static final private Color CLOSE_BUTTON_COLOR = new Color(228, 96, 96);
-    static final private Color CHAIRS_COLOR = Color.WHITE;
-    static final private Color SHADOW_COLOR = Color.GRAY;
-    static final private Color TABLES_COLOR = new Color(0x37B776);
-    static final private Color SELECTED_COLOR = new Color(0x00FF28);
+    private static final Color CHAIRS_COLOR = Color.WHITE;
+    private static final Color ORDER_DONE_COLOR = new Color(0xFF464A);
+    private static final Color SHADOW_COLOR = Color.GRAY;
+    private static final Color TABLES_COLOR = new Color(0x37B776);
+    private static final Color SELECTED_COLOR = new Color(0x00FF28);
 
     public TableArea(Window window){
+        id = UUID.randomUUID();
         this.window = window;
         this.controller = this.window.getController();
-        tables = new TableBase();
+        controller.addTableAreaToMap(this);
         addTableAreaListeners();
     }
 
@@ -33,17 +37,17 @@ public class TableArea extends JComponent {
     protected void paintComponent(Graphics g){
         g.setColor(Color.LIGHT_GRAY);
         g.fillRect(0,0,2000,2000);
-        int size = tables.size();
-        for(int i = 0; i < size; i++){
-            Table table = tables.getTable(i);
-            drawChairs(g, table);
-            drawTable(g,table);
-        }
+        List<Table> tables = controller.getTablesFromTab(this);
+        tables.forEach((t)->{
+            drawChairs(g, t);
+            drawTable(g,t);
+        });
     }
 
     private void drawChairs(Graphics g, Table table){
-        int xCoord = table.getxCoord();
-        int yCoord = table.getyCoord();
+        Point point = controller.getTableCoord(table);
+        int xCoord = point.getX();
+        int yCoord = point.getY();
         g.setColor(SHADOW_COLOR);
         g.fillOval(xCoord - Table.WIDTH * 2, yCoord - Table.LENGTH * 2, Table.WIDTH, Table.LENGTH);
         g.fillOval(xCoord + Table.WIDTH, yCoord - Table.LENGTH * 2, Table.WIDTH, Table.LENGTH);
@@ -57,15 +61,21 @@ public class TableArea extends JComponent {
     }
 
     private void drawTable(Graphics g, Table table){
-        int xCoord = table.getxCoord();
-        int yCoord = table.getyCoord();
+        Point point = controller.getTableCoord(table);
+        int xCoord = point.getX();
+        int yCoord = point.getY();
         g.setColor(SHADOW_COLOR);
         g.fillRoundRect(xCoord - Table.WIDTH - 4, yCoord - Table.LENGTH - 4, Table.WIDTH * 2, Table.LENGTH*2, 15, 15);
-        if (table.isSelected()) {
+        if (table.equals(controller.getSelectedTable())) {
             g.setColor(SELECTED_COLOR);
         }
         else{
-            g.setColor(TABLES_COLOR);
+            if (controller.isOrderDone(table)) {
+                g.setColor(ORDER_DONE_COLOR);
+            }
+            else{
+                g.setColor(TABLES_COLOR);
+            }
         }
         g.fillRoundRect(xCoord - Table.WIDTH, yCoord - Table.LENGTH, Table.WIDTH * 2, Table.LENGTH*2, 15, 15);
         g.setColor(Color.BLACK);
@@ -73,15 +83,7 @@ public class TableArea extends JComponent {
     }
 
     public Table getSelectedTable(){
-        Table selectedTable = null;
-        int size = tables.size();
-        for(int i = 0; i < size; i++) {
-            Table table = tables.getTable(i);
-            if (table.isSelected()) {
-                selectedTable = tables.getTable(i);
-            }
-        }
-        return selectedTable;
+        return controller.getSelectedTable();
     }
 
     private void addTableAreaListeners(){
@@ -111,10 +113,35 @@ public class TableArea extends JComponent {
         });
     }
 
-    public TableBase getTables() {
-        return tables;
+    public Table getLastSelectedTable(){
+        return controller.getLastSelectedTable();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TableArea)) return false;
+
+        TableArea tableArea = (TableArea) o;
+
+        return id.equals(tableArea.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }
 
 
+//    public Table getSelectedTable(){
+//        Table selectedTable = null;
+//        int size = tables.size();
+//        for(int i = 0; i < size; i++) {
+//            Table table = tables.getTable(i);
+//            if (table.equals(controller.getSelectedTable())) {
+//                selectedTable = tables.getTable(i);
+//            }
+//        }
+//        return selectedTable;
+//    }

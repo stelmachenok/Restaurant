@@ -1,6 +1,8 @@
 package Controller;
 
 import Model.Dish;
+import Model.Table;
+import View.DishOrderPanel;
 import View.DishPanel;
 import View.Window;
 
@@ -33,7 +35,7 @@ public class DishPanelController {
         panel.updateUI();
     }
 
-    public void createGridBagConstraints(){
+    public void createGridBagConstraints(int gridheight, int gridwidth) {
         constraints = new GridBagConstraints();
         constraints.anchor = GridBagConstraints.NORTH;
         constraints.fill = GridBagConstraints.PAGE_START;
@@ -50,11 +52,6 @@ public class DishPanelController {
 
     public void fillingDishList() {
         JTabbedPane dishTabbedPane = dishPanel.getTabbedPane();
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addChangeListener(e -> {
-            refreshEditPaneFields();
-        });
-        tabbedPane.addTab("Алкогольные", new JPanel(new GridBagLayout()));
 
         dishes = new ArrayList<>();
         Dish dish = new Dish("Espresso", 15);
@@ -75,57 +72,58 @@ public class DishPanelController {
         hotPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                DishEditController dishEditController = dishPanel.getEditDishPanel().getController();
+                DishEditController dishEditController = window.getDishEditPanel().getController();
                 dishEditController.setSelectedDish(null);
                 dishEditController.refreshEditPaneFields();
+
             }
         });
 
-        createGridBagConstraints();
+        createGridBagConstraints(1, 5);
 
-
-        tabbedPane.addTab("Горячие", hotPanel);
-        dishTabbedPane.add("Напитки", tabbedPane);
+        dishTabbedPane.add("Горячие Напитки", hotPanel);
 
         for (Dish currentDish : dishes) {
             hotPanel.add(currentDish, constraints);
             currentDish.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    DishEditController dishEditController = dishPanel.getEditDishPanel().getController();
+                    DishEditController dishEditController = window.getDishEditPanel().getController();
                     dishEditController.setSelectedDish(currentDish);
                     dishEditController.refreshEditPaneFields();
+                    Table lastSelectedTable = window.getController().getLastSelectedTable();
+                    window.getDishOrderPanel().getController().addDishToTable(lastSelectedTable, currentDish);
+                    GridBagConstraints constraints = window.getDishOrderPanel().getOrderСonstraints();
+                    List<Dish> dishes = window.getDishOrderPanel().getController().getDishesFromTable(lastSelectedTable);
+                    DishOrderPanel dishOrderPanel = window.getDishOrderPanel();
+                    dishes.forEach((d)->{
+                        dishOrderPanel.getOrderDishesPanel().add(d, constraints);
+                        constraints.gridy++;
+
+                    });
+
+                    dishPanel.updateUI();
                 }
             });
         }
 
-        JTabbedPane foodTabbedPane = new JTabbedPane();
-        foodTabbedPane.addChangeListener(e -> {
-            refreshEditPaneFields();
-        });
-        dishTabbedPane.add("Еда", foodTabbedPane);
+        dishTabbedPane.add("Еда", new JPanel(new GridBagLayout()));
     }
 
-//    public void setAllDishesNotSelected() {
-//        for (Dish dish : dishes) {
-//            dish.setSelected(false);
-//        }
-//    }
-
-    public void addDish(){
+    public void addDish() {
         Dish dish = new Dish("Новое блюдо", 25);
         dishes.add(dish);
         dish.setVisible(true);
         JTabbedPane tabbedPane = dishPanel.getTabbedPane();
         if (tabbedPane.getTabCount() > 0) {
             JTabbedPane typeTabbedPane = (JTabbedPane) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
-            if (typeTabbedPane.getTabCount() > 0){
-                JPanel dishTypePanel = (JPanel)typeTabbedPane.getComponentAt(typeTabbedPane.getSelectedIndex());
+            if (typeTabbedPane.getTabCount() > 0) {
+                JPanel dishTypePanel = (JPanel) typeTabbedPane.getComponentAt(typeTabbedPane.getSelectedIndex());
                 dishTypePanel.add(dish, constraints);
                 dish.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        DishEditController dishEditController = dishPanel.getEditDishPanel().getController();
+                        DishEditController dishEditController = window.getDishEditPanel().getController();
                         dishEditController.setSelectedDish(dish);
                         dishEditController.refreshEditPaneFields();
                     }
@@ -136,7 +134,7 @@ public class DishPanelController {
     }
 
     public void refreshEditPaneFields() {
-        dishPanel.getEditDishPanel().getController().refreshEditPaneFields();
+        window.getDishEditPanel().getController().refreshEditPaneFields();
     }
 
 

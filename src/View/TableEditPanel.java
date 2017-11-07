@@ -14,12 +14,13 @@ import static View.Window.TAB_AND_BUTTON_FONT;
 /**
  * Created by y50-70 on 12.10.2017.
  */
-public class TableEditPanel extends AbstractEditPanel {
+public class TableEditPanel extends JPanel {
     private JTextField hallNameTextField;
     private JTextField tableNameTextField;
     private JTabbedPane tableTabbedPane;
     private Window window;
     private TableEditController controller;
+    private GridBagConstraints constraints;
 
     public void setTableTabbedPane(JTabbedPane tableTabbedPane) {
         this.tableTabbedPane = tableTabbedPane;
@@ -38,7 +39,10 @@ public class TableEditPanel extends AbstractEditPanel {
     }
 
     TableEditPanel(Window window, JTabbedPane tableTabbedPane) {
-        super(1, 8);
+        super(new GridBagLayout());
+        setVisible(false);
+        initGridBagConstraints();
+
         this.window = window;
         this.tableTabbedPane = tableTabbedPane;
         controller = new TableEditController(window, tableTabbedPane);
@@ -97,11 +101,14 @@ public class TableEditPanel extends AbstractEditPanel {
         tableNameTextField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                Table table = window.getCurrentTableArea().getSelectedTable();
-                if (table != null) {
-                    table.setTableName(tableNameTextField.getText());
+                TableArea tableArea = window.getCurrentTableArea();
+                if (tableArea != null) {
+                    Table table = tableArea.getSelectedTable();
+                    if (table != null) {
+                        table.setTableName(tableNameTextField.getText());
+                    }
+                    tableTabbedPane.repaint();
                 }
-                tableTabbedPane.repaint();
             }
         });
         constraints.gridy++;
@@ -115,4 +122,32 @@ public class TableEditPanel extends AbstractEditPanel {
         constraints.gridy++;
         add(button, constraints);
     }
+
+    private void initGridBagConstraints() {
+        constraints = new GridBagConstraints();
+        constraints.anchor = GridBagConstraints.CENTER;
+        constraints.fill = GridBagConstraints.CENTER;
+        constraints.gridheight = 1;
+        constraints.gridwidth = 8;
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.insets = new Insets(10, 0, 0, 0);
+        constraints.ipadx = 1;
+        constraints.ipady = 1;
+        constraints.weightx = 0.0;
+        constraints.weighty = 0.0;
+    }
 }
+
+
+//        window.addDishPanelListener(new DishPanelListener() {
+//            @Override
+//            public JTextField getTableNameTextField() {
+//                return tableNameTextField;
+//            }
+//
+//            @Override
+//            public JTextField getHallNameTextField() {
+//                return hallNameTextField;
+//            }
+//        });
