@@ -17,41 +17,33 @@ import static View.Window.TAB_AND_BUTTON_FONT;
 public class TableEditPanel extends JPanel {
     private JTextField hallNameTextField;
     private JTextField tableNameTextField;
-    private JTabbedPane tableTabbedPane;
     private Window window;
     private TableEditController controller;
     private GridBagConstraints constraints;
 
-    public void setTableTabbedPane(JTabbedPane tableTabbedPane) {
-        this.tableTabbedPane = tableTabbedPane;
-    }
-
-    public void setWindow(Window window) {
-        this.window = window;
-    }
-
-    public JTextField getHallNameTextField() {
-        return hallNameTextField;
-    }
-
-    public JTextField getTableNameTextField() {
-        return tableNameTextField;
-    }
-
-    TableEditPanel(Window window, JTabbedPane tableTabbedPane) {
+    TableEditPanel(Window window) {
         super(new GridBagLayout());
+        this.window = window;
+        controller = new TableEditController(window);
         setVisible(false);
         initGridBagConstraints();
+        fillContent();
+    }
 
-        this.window = window;
-        this.tableTabbedPane = tableTabbedPane;
-        controller = new TableEditController(window, tableTabbedPane);
-        JLabel label = new JLabel("<html><u>Зал</u></html>");
+    private void fillContent() {
+        createSaleSection();
+        createTableSection();
+    }
+
+    private void createSaleSection() {
+        JLabel label;
+        JButton button;
+
+        label = new JLabel("<html><u>Зал</u></html>");
         label.setForeground(new Color(225, 0, 25));
         label.setFont(TAB_AND_BUTTON_FONT);
         add(label, constraints);
 
-        JButton button;
         button = new JButton("Добавить");
         button.addActionListener(e -> {
             controller.addTableArea();
@@ -65,9 +57,7 @@ public class TableEditPanel extends JPanel {
         hallNameTextField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if (tableTabbedPane.getTabCount() > 0) {
-                    tableTabbedPane.setTitleAt(tableTabbedPane.getSelectedIndex(), hallNameTextField.getText());
-                }
+                controller.changeTableAreaName();
             }
         });
         constraints.gridy++;
@@ -76,11 +66,16 @@ public class TableEditPanel extends JPanel {
         button = new JButton("Удалить");
         button.setFont(TAB_AND_BUTTON_FONT);
         button.addActionListener(e -> {
-            if (tableTabbedPane.getTabCount() > 0)
-                tableTabbedPane.removeTabAt(tableTabbedPane.getSelectedIndex());
+            controller.removeTableArea();
         });
         constraints.gridy++;
         add(button, constraints);
+
+    }
+
+    private void createTableSection() {
+        JLabel label;
+        JButton button;
 
         label = new JLabel("<html><u>Стол</u></html>");
         label.setForeground(new Color(225, 0, 25));
@@ -101,14 +96,7 @@ public class TableEditPanel extends JPanel {
         tableNameTextField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                TableArea tableArea = window.getCurrentTableArea();
-                if (tableArea != null) {
-                    Table table = tableArea.getSelectedTable();
-                    if (table != null) {
-                        table.setTableName(tableNameTextField.getText());
-                    }
-                    tableTabbedPane.repaint();
-                }
+                controller.changeTableName();
             }
         });
         constraints.gridy++;
@@ -128,7 +116,7 @@ public class TableEditPanel extends JPanel {
         constraints.anchor = GridBagConstraints.CENTER;
         constraints.fill = GridBagConstraints.CENTER;
         constraints.gridheight = 1;
-        constraints.gridwidth = 8;
+        constraints.gridwidth = 1;
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.insets = new Insets(10, 0, 0, 0);
@@ -137,17 +125,16 @@ public class TableEditPanel extends JPanel {
         constraints.weightx = 0.0;
         constraints.weighty = 0.0;
     }
+
+    public JTextField getHallNameTextField() {
+        return hallNameTextField;
+    }
+
+    public JTextField getTableNameTextField() {
+        return tableNameTextField;
+    }
+
+    public void setWindow(Window window) {
+        this.window = window;
+    }
 }
-
-
-//        window.addDishPanelListener(new DishPanelListener() {
-//            @Override
-//            public JTextField getTableNameTextField() {
-//                return tableNameTextField;
-//            }
-//
-//            @Override
-//            public JTextField getHallNameTextField() {
-//                return hallNameTextField;
-//            }
-//        });

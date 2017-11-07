@@ -7,7 +7,6 @@ import Model.Table;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
 
 import static View.Window.*;
@@ -23,39 +22,33 @@ public class DishOrderPanel extends JPanel {
     private JPanel orderDishesPanel;
     private JLabel selectedTableNameLabel;
 
-    public GridBagConstraints getOrderСonstraints() {
-        return orderСonstraints;
-    }
-
-    public JLabel getSelectedTableNameLabel() {
-        return selectedTableNameLabel;
-    }
-
-    public DishOrderController getController() {
-        return controller;
-    }
-
-    public JPanel getOrderDishesPanel() {
-        return orderDishesPanel;
-    }
-
-    public DishOrderPanel(Window window) {
+    DishOrderPanel(Window window) {
         super(new GridBagLayout());
-        setVisible(true);
-        constraints = initGridBagConstraints(1, 4);
-        setPreferredSize(new Dimension(250, 480));
         this.window = window;
         controller = new DishOrderController(this, this.window);
+        constraints = initGridBagConstraints(1, 4);
+        setVisible(true);
+        setPreferredSize(new Dimension(250, 480));
+        fillContent();
+    }
 
+    private void fillContent() {
+        addTableName();
+        addOrderButton();
+        addPrintButton();
+    }
+
+    private void addTableName() {
         JButton button;
-        JLabel label = new JLabel("<html><u>Заказ</u></html>");
+        JLabel label;
+        label = new JLabel("<html><u>Заказ</u></html>");
         label.setForeground(new Color(225, 0, 25));
         label.setFont(TAB_AND_BUTTON_FONT);
         add(label, constraints);
         constraints.gridy++;
 
         orderDishesPanel = new JPanel(new GridBagLayout());
-        orderСonstraints = initGridBagConstraints(1, 100);
+        orderСonstraints = initGridBagConstraints(3, 100);
 
         selectedTableNameLabel = new JLabel("<html><u>Стол</u></html>");
         Table table = window.getCurrentTableArea().getLastSelectedTable();
@@ -63,7 +56,9 @@ public class DishOrderPanel extends JPanel {
             selectedTableNameLabel = new JLabel("<html><u>" + table.getTableName() + "</u></html>");
             List<Dish> dishes = window.getDishOrderPanel().getController().getDishesFromTable(table);
             orderDishesPanel.removeAll();
-            dishes.forEach((d) -> orderDishesPanel.add(d));
+            dishes.forEach((d) -> {
+                window.getDishOrderPanel().getController().addDishToDisplay(table, d);
+            });
         }
         selectedTableNameLabel.setForeground(new Color(0, 0, 0));
         selectedTableNameLabel.setFont(TAB_AND_BUTTON_FONT);
@@ -73,7 +68,10 @@ public class DishOrderPanel extends JPanel {
 
         add(orderDishesPanel, constraints);
         constraints.gridy++;
+    }
 
+    private void addOrderButton() {
+        JButton button;
         constraints.gridy = 1000;
         button = new JButton("Оформить заказ");
         button.addActionListener(e -> {
@@ -87,13 +85,16 @@ public class DishOrderPanel extends JPanel {
         button.setFont(TAB_AND_BUTTON_FONT);
         add(button, constraints);
         constraints.gridy++;
+    }
 
+    private void addPrintButton() {
+        JButton button;
         button = new JButton("Печать чека");
         button.addActionListener(e -> {
             DishPanel dishPanel = window.getDishPanel();
             Table lastSelectedTable = dishPanel.getWindow().getCurrentTableArea().getLastSelectedTable();
             String tableName = lastSelectedTable.getTableName();
-            Component[] dishes = (Component[]) orderDishesPanel.getComponents();
+            List<Dish> dishes = window.getDishOrderPanel().getController().getDishesFromTable(lastSelectedTable);
             CheckPrinter.printCheck(tableName, dishes);
             window.getController().setOrderDone(lastSelectedTable, false);
             dishPanel.getController().backToSimpleMode();
@@ -108,8 +109,8 @@ public class DishOrderPanel extends JPanel {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.anchor = GridBagConstraints.CENTER;
         constraints.fill = GridBagConstraints.CENTER;
-        constraints.gridheight = gridheight;
-        constraints.gridwidth = gridwidth;
+        constraints.gridheight = 1;
+        constraints.gridwidth = 1;
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.insets = new Insets(10, 0, 0, 0);
@@ -118,5 +119,21 @@ public class DishOrderPanel extends JPanel {
         constraints.weightx = 0.0;
         constraints.weighty = 0.0;
         return constraints;
+    }
+
+    public GridBagConstraints getOrderСonstraints() {
+        return orderСonstraints;
+    }
+
+    public JLabel getSelectedTableNameLabel() {
+        return selectedTableNameLabel;
+    }
+
+    public DishOrderController getController() {
+        return controller;
+    }
+
+    public JPanel getOrderDishesPanel() {
+        return orderDishesPanel;
     }
 }

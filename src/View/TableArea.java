@@ -33,17 +33,6 @@ public class TableArea extends JComponent {
         addTableAreaListeners();
     }
 
-    @Override
-    protected void paintComponent(Graphics g){
-        g.setColor(Color.LIGHT_GRAY);
-        g.fillRect(0,0,2000,2000);
-        List<Table> tables = controller.getTablesFromTab(this);
-        tables.forEach((t)->{
-            drawChairs(g, t);
-            drawTable(g,t);
-        });
-    }
-
     private void drawChairs(Graphics g, Table table){
         Point point = controller.getTableCoord(table);
         int xCoord = point.getX();
@@ -82,10 +71,6 @@ public class TableArea extends JComponent {
         g.drawString(table.getTableName(), xCoord - Table.WIDTH, yCoord - Table.LENGTH + 20);
     }
 
-    public Table getSelectedTable(){
-        return controller.getSelectedTable();
-    }
-
     private void addTableAreaListeners(){
         addMouseListener(new MouseAdapter() {
             @Override
@@ -118,6 +103,17 @@ public class TableArea extends JComponent {
     }
 
     @Override
+    protected void paintComponent(Graphics g){
+        g.setColor(Color.LIGHT_GRAY);
+        g.fillRect(0,0,2000,2000);
+        List<Table> tables = controller.getTablesFromTab(this);
+        tables.forEach((t)->{
+            drawChairs(g, t);
+            drawTable(g,t);
+        });
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TableArea)) return false;
@@ -132,16 +128,3 @@ public class TableArea extends JComponent {
         return id.hashCode();
     }
 }
-
-
-//    public Table getSelectedTable(){
-//        Table selectedTable = null;
-//        int size = tables.size();
-//        for(int i = 0; i < size; i++) {
-//            Table table = tables.getTable(i);
-//            if (table.equals(controller.getSelectedTable())) {
-//                selectedTable = tables.getTable(i);
-//            }
-//        }
-//        return selectedTable;
-//    }

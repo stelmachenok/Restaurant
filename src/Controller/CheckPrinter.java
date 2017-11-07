@@ -2,11 +2,10 @@ package Controller;
 
 import Model.Dish;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by y50-70 on 27.10.2017.
@@ -14,7 +13,7 @@ import java.util.Arrays;
 public class CheckPrinter {
     private static final String FILENAME = "check.txt";
 
-    public static void printCheck(String tableName, Component[] components) {
+    public static void printCheck(String tableName, List<Dish> components) {
         File file = new File(FILENAME);
 
         try {
@@ -30,12 +29,9 @@ public class CheckPrinter {
                 checkText += "======================\n";
                 checkText += "========Заказ=========\n";
                 int sum = 0;
-                for (int i = 0; i < components.length; i++) {
-                    if (components[i] instanceof Dish) {
-                        Dish dish = (Dish) components[i];
-                        checkText += dish.getDishName() + " " + dish.getPrice() + "\n";
-                        sum += dish.getPrice();
-                    }
+                for (Dish dish : components) {
+                    checkText += dish.getDishName() + " " + dish.getPrice() + "\n";
+                    sum += dish.getPrice();
                 }
                 checkText += "========Итого=========\n";
                 checkText += sum + "\n";

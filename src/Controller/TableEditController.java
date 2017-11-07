@@ -13,10 +13,8 @@ import java.util.List;
  */
 public class TableEditController {
     private Window window;
-    private JTabbedPane tableTabbedPane;
 
-    public TableEditController(Window window, JTabbedPane tableTabbedPane) {
-        this.tableTabbedPane = tableTabbedPane;
+    public TableEditController(Window window) {
         this.window = window;
     }
 
@@ -33,12 +31,6 @@ public class TableEditController {
         tableArea.repaint();
     }
 
-    public void addTableArea() {
-        JTabbedPane tabbedPane = window.getTabbedPane();
-        TableArea tableArea = new TableArea(window);
-        tabbedPane.addTab("New Hall", tableArea);
-    }
-
     public void removeTable() {
         TableArea tableArea = window.getCurrentTableArea();
 
@@ -47,5 +39,36 @@ public class TableEditController {
             window.getController().removeFromMap(tableArea, table);
         }
         tableArea.repaint();
+    }
+
+    public void changeTableName(){
+        JTabbedPane tableTabbedPane = window.getTabbedPane();
+        TableArea tableArea = window.getCurrentTableArea();
+        if (tableArea != null) {
+            Table table = window.getController().getSelectedTable();
+            if (table != null) {
+                table.setTableName(window.getTableEditPanel().getTableNameTextField().getText());
+            }
+            tableTabbedPane.repaint();
+        }
+    }
+
+    public void addTableArea() {
+        JTabbedPane tabbedPane = window.getTabbedPane();
+        TableArea tableArea = new TableArea(window);
+        tabbedPane.addTab("New Hall", tableArea);
+    }
+
+    public void removeTableArea(){
+        JTabbedPane tableTabbedPane = window.getTabbedPane();
+        if (tableTabbedPane.getTabCount() > 0)
+            tableTabbedPane.removeTabAt(tableTabbedPane.getSelectedIndex());
+    }
+
+    public void changeTableAreaName() {
+        JTabbedPane tableTabbedPane = window.getTabbedPane();
+        if (tableTabbedPane.getTabCount() > 0) {
+            tableTabbedPane.setTitleAt(tableTabbedPane.getSelectedIndex(), window.getTableEditPanel().getHallNameTextField().getText());
+        }
     }
 }

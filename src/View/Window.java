@@ -38,23 +38,6 @@ public class Window {
         panel.updateUI();
     }
 
-    private void createDishEditPanel(){
-        dishEditPanel = new DishEditPanel(this);
-    }
-
-    private void createDishOrderPanel(){
-        dishOrderPanel = new DishOrderPanel(this);
-    }
-
-    private void createDishPanel(){
-        dishPanel = new DishPanel(this);
-        dishPanel.addChangeListener();
-    }
-
-    private void createController() {
-        controller = new Controller(this);
-    }
-
     private void createFrame(){
         frame = new JFrame("Restaurant");
         panel = new JPanel(new BorderLayout());
@@ -64,22 +47,8 @@ public class Window {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
-    private void createToolBar(){
-        toolBar = new JToolBar("ToolBar", JToolBar.HORIZONTAL);
-        createEditButton();
-        createExitButton();
-        createReadyButton();
-        panel.add(toolBar, BorderLayout.NORTH);
-
-    }
-
-    public JTextField getTableNameTextField() {
-        return tableEditPanel.getTableNameTextField();
-    }
-
-    private void createEditPanel(){
-        tableEditPanel = new TableEditPanel(this, tabbedPane);
-        panel.add(tableEditPanel, BorderLayout.EAST);
+    private void createController() {
+        controller = new Controller(this);
     }
 
     private void createTabbedPane(){
@@ -92,29 +61,30 @@ public class Window {
         panel.add(tabbedPane, BorderLayout.CENTER);
     }
 
-    public Controller getController() {
-        return controller;
+    private void createEditPanel(){
+        tableEditPanel = new TableEditPanel(this);
+        panel.add(tableEditPanel, BorderLayout.EAST);
     }
 
-    public JPanel getPanel() {
-        return panel;
+    private void createToolBar(){
+        toolBar = new JToolBar("ToolBar", JToolBar.HORIZONTAL);
+        createEditButton();
+        createExitButton();
+        createReadyButton();
+        panel.add(toolBar, BorderLayout.NORTH);
+
     }
 
-    public JFrame getFrame() {
-        return frame;
+    private void createDishEditPanel(){
+        dishEditPanel = new DishEditPanel(this);
     }
 
-    public DishPanel getDishPanel() {
-        return dishPanel;
+    private void createDishOrderPanel(){
+        dishOrderPanel = new DishOrderPanel(this);
     }
 
-    public TableArea getCurrentTableArea() {
-        if (tabbedPane.getTabCount() > 0) {
-            return (TableArea) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
-        }
-        else{
-            return null;
-        }
+    private void createDishPanel(){
+        dishPanel = new DishPanel(this);
     }
 
     private void createEditButton(){
@@ -147,10 +117,6 @@ public class Window {
 
     }
 
-    boolean isEditModeOn() {
-        return isEditModeOn;
-    }
-
     private void createExitButton(){
         exitButton = new JButton("Выйти");
         exitButton.setFont(TAB_AND_BUTTON_FONT);
@@ -158,6 +124,35 @@ public class Window {
 
         });
         toolBar.add(exitButton);
+    }
+
+    public Controller getController() {
+        return controller;
+    }
+
+    public JPanel getPanel() {
+        return panel;
+    }
+
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    public DishPanel getDishPanel() {
+        return dishPanel;
+    }
+
+    public TableArea getCurrentTableArea() {
+        if (tabbedPane.getTabCount() > 0) {
+            return (TableArea) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
+        }
+        else{
+            return null;
+        }
+    }
+
+    boolean isEditModeOn() {
+        return isEditModeOn;
     }
 
     public DishEditPanel getDishEditPanel() {
@@ -180,14 +175,3 @@ public class Window {
         new Window();
     }
 }
-
-//    private DishPanelListener dishPanelListener;
-//
-//    public void addDishPanelListener(DishPanelListener dishPanelListener){
-//        this.dishPanelListener = dishPanelListener;
-//    }
-//
-//    public DishPanelListener getDishPanelListener() {
-//        return dishPanelListener;
-//    }
-

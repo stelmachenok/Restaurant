@@ -6,8 +6,6 @@ import View.DishPanel;
 import View.Window;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 /**
@@ -97,32 +95,3 @@ public class DishEditController {
         selectedDish = dish;
     }
 }
-
-//    public void removeSubType(){
-//        JTabbedPane dishTabbedPane = window.getDishPanel().getTabbedPane();
-//        if (dishTabbedPane.getTabCount() > 0) {
-//            JTabbedPane typeTabbedPane = (JTabbedPane)dishTabbedPane.getComponentAt(dishTabbedPane.getSelectedIndex());
-//            if (typeTabbedPane.getTabCount() > 0){
-//                typeTabbedPane.removeTabAt(typeTabbedPane.getSelectedIndex());
-//            }
-//        }
-//        refreshEditPaneFields();
-//    }
-
-
-//    public void addSubType() {
-//        if (dishTabbedPane.getTabCount() > 0) {
-//            JTabbedPane typeTabbedPane = (JTabbedPane)dishTabbedPane.getComponentAt(dishTabbedPane.getSelectedIndex());
-//            typeTabbedPane.addTab("Новый подтип",  new JPanel(new BorderLayout()));
-//            refreshEditPaneFields();
-//        }
-//    }
-
-//    public void changeSubTypeName() {
-//        if (dishTabbedPane.getTabCount() > 0) {
-//            JTabbedPane typeTabbedPane = (JTabbedPane) dishTabbedPane.getComponentAt(dishTabbedPane.getSelectedIndex());
-//            if (typeTabbedPane.getTabCount() > 0){
-//                typeTabbedPane.setTitleAt(typeTabbedPane.getSelectedIndex(), dishEditPanel.getSubTypeTextField().getText());
-//            }
-//        }
-//    }

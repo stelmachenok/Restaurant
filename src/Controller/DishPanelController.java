@@ -35,21 +35,8 @@ public class DishPanelController {
         panel.updateUI();
     }
 
-    public void createGridBagConstraints(int gridheight, int gridwidth) {
-        constraints = new GridBagConstraints();
-        constraints.anchor = GridBagConstraints.NORTH;
-        constraints.fill = GridBagConstraints.PAGE_START;
-        constraints.gridheight = 1;
-        constraints.gridwidth = 5;
-        constraints.gridx = GridBagConstraints.RELATIVE;
-        constraints.gridy = 0;
-        constraints.insets = new Insets(10, 5, 0, 5);
-        constraints.ipadx = 1;
-        constraints.ipady = 1;
-        constraints.weightx = 100;
-        constraints.weighty = 1;
-    }
 
+    //todo перенети во view, сделать заполнение через xml
     public void fillingDishList() {
         JTabbedPane dishTabbedPane = dishPanel.getTabbedPane();
 
@@ -79,7 +66,7 @@ public class DishPanelController {
             }
         });
 
-        createGridBagConstraints(1, 5);
+        createGridBagConstraints();
 
         dishTabbedPane.add("Горячие Напитки", hotPanel);
 
@@ -88,21 +75,7 @@ public class DishPanelController {
             currentDish.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    DishEditController dishEditController = window.getDishEditPanel().getController();
-                    dishEditController.setSelectedDish(currentDish);
-                    dishEditController.refreshEditPaneFields();
-                    Table lastSelectedTable = window.getController().getLastSelectedTable();
-                    window.getDishOrderPanel().getController().addDishToTable(lastSelectedTable, currentDish);
-                    GridBagConstraints constraints = window.getDishOrderPanel().getOrderСonstraints();
-                    List<Dish> dishes = window.getDishOrderPanel().getController().getDishesFromTable(lastSelectedTable);
-                    DishOrderPanel dishOrderPanel = window.getDishOrderPanel();
-                    dishes.forEach((d)->{
-                        dishOrderPanel.getOrderDishesPanel().add(d, constraints);
-                        constraints.gridy++;
-
-                    });
-
-                    dishPanel.updateUI();
+                    addDishListener(currentDish);
                 }
             });
         }
@@ -110,7 +83,7 @@ public class DishPanelController {
         dishTabbedPane.add("Еда", new JPanel(new GridBagLayout()));
     }
 
-    public void addDish() {
+    void addDish() {
         Dish dish = new Dish("Новое блюдо", 25);
         dishes.add(dish);
         dish.setVisible(true);
@@ -133,9 +106,34 @@ public class DishPanelController {
         }
     }
 
-    public void refreshEditPaneFields() {
-        window.getDishEditPanel().getController().refreshEditPaneFields();
+    private void createGridBagConstraints() {
+        constraints = new GridBagConstraints();
+        constraints.anchor = GridBagConstraints.NORTH;
+        constraints.fill = GridBagConstraints.PAGE_START;
+        constraints.gridheight = 1;
+        constraints.gridwidth = 1;
+        constraints.gridx = GridBagConstraints.RELATIVE;
+        constraints.gridy = 0;
+        constraints.insets = new Insets(10, 5, 0, 5);
+        constraints.ipadx = 1;
+        constraints.ipady = 1;
+        constraints.weightx = 100;
+        constraints.weighty = 1;
     }
 
+    private void addDishListener(Dish dish) {
+        DishEditController dishEditController = window.getDishEditPanel().getController();
+        dishEditController.setSelectedDish(dish);
+        dishEditController.refreshEditPaneFields();
+        Table lastSelectedTable = window.getController().getLastSelectedTable();
+        DishOrderPanel dishOrderPanel = window.getDishOrderPanel();
+        dishOrderPanel.getController().addDishToTable(lastSelectedTable, dish);
+        List<Dish> dishes = dishOrderPanel.getController().getDishesFromTable(lastSelectedTable);
+        window.getDishOrderPanel().getOrderDishesPanel().removeAll();
+        dishes.forEach((d) -> {
+            window.getDishOrderPanel().getController().addDishToDisplay(lastSelectedTable, d);
+        });
 
+        dishPanel.updateUI();
+    }
 }

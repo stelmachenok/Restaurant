@@ -20,45 +20,30 @@ public class DishEditPanel extends JPanel {
     private Window window;
     private GridBagConstraints constraints;
 
-    public DishEditController getController() {
-        return controller;
-    }
-
-    public JTextField getTypeTextField() {
-        return typeTextField;
-    }
-
-    public JTextField getDishNameTextField() {
-        return dishNameTextField;
-    }
-
-    public JTextField getDishPriceTextField() {
-        return dishPriceTextField;
-    }
-
     DishEditPanel(Window window) {
         super(new GridBagLayout());
-        setVisible(false);
-        initGridBagConstraints();
         this.window = window;
-        setVisible(true);
-//        this.dishTabbedPane = dishTabbedPane;
         controller = new DishEditController(window, this);
-//        this.dishPanel.addPanelListener(new DishPanelListener() {
-//            @Override
-//            public void getTableNameTextField() {
-//
-//                controller.refreshEditPaneFields();
-//            }
-//        });
+        setVisible(true);
+        initGridBagConstraints();
+        fillContent();
+    }
 
-        JLabel label = new JLabel("<html><u>Раздел</u></html>");
+    private void fillContent(){
+        addTypeContent();
+        addDishContent();
+    }
+
+    private void addTypeContent(){
+        JLabel label;
+        JButton button;
+
+        label = new JLabel("<html><u>Раздел</u></html>");
         label.setForeground(new Color(225, 0, 25));
         label.setFont(TAB_AND_BUTTON_FONT);
         add(label, constraints);
         constraints.gridy++;
 
-        JButton button;
         button = new JButton("Добавить");
         button.addActionListener(e -> {
             controller.addType();
@@ -86,8 +71,11 @@ public class DishEditPanel extends JPanel {
         button.setFont(TAB_AND_BUTTON_FONT);
         add(button, constraints);
         constraints.gridy++;
+    }
 
-
+    private void addDishContent(){
+        JLabel label;
+        JButton button;
 
         label = new JLabel("<html><u>Блюдо</u></html>");
         label.setForeground(new Color(225, 0, 25));
@@ -132,7 +120,6 @@ public class DishEditPanel extends JPanel {
             @Override
             public void keyReleased(KeyEvent e) {
                 controller.changeDishPrice();
-                //dishTabbedPane.updateUI();
             }
         });
         dishPriceTextField.setFont(TAB_AND_BUTTON_FONT);
@@ -152,7 +139,7 @@ public class DishEditPanel extends JPanel {
         constraints.anchor = GridBagConstraints.CENTER;
         constraints.fill = GridBagConstraints.CENTER;
         constraints.gridheight = 1;
-        constraints.gridwidth = 15;
+        constraints.gridwidth = 1;
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.insets = new Insets(10, 0, 0, 0);
@@ -161,37 +148,20 @@ public class DishEditPanel extends JPanel {
         constraints.weightx = 0.0;
         constraints.weighty = 0.0;
     }
-}
 
-//label = new JLabel("<html><u>Подраздел</u></html>");
-//        label.setForeground(new Color(225, 0, 25));
-//        label.setFont(TAB_AND_BUTTON_FONT);
-//        add(label, constraints);
-//        constraints.gridy++;
-//
-//        button = new JButton("Добавить");
-//        button.addActionListener(e -> {
-//        controller.addSubType();
-//        });
-//        button.setFont(TAB_AND_BUTTON_FONT);
-//        add(button, constraints);
-//        constraints.gridy++;
-//
-//        subTypeTextField = new JTextField(10);
-//        subTypeTextField.addKeyListener(new KeyAdapter() {
-//@Override
-//public void keyReleased(KeyEvent e) {
-//        controller.changeSubTypeName();
-//        }
-//        });
-//        subTypeTextField.setFont(TAB_AND_BUTTON_FONT);
-//        add(subTypeTextField, constraints);
-//        constraints.gridy++;
-//
-//        button = new JButton("Удалить");
-//        button.addActionListener(e -> {
-//        controller.removeSubType();
-//        });
-//        button.setFont(TAB_AND_BUTTON_FONT);
-//        add(button, constraints);
-//        constraints.gridy++;
+    public DishEditController getController() {
+        return controller;
+    }
+
+    public JTextField getTypeTextField() {
+        return typeTextField;
+    }
+
+    public JTextField getDishNameTextField() {
+        return dishNameTextField;
+    }
+
+    public JTextField getDishPriceTextField() {
+        return dishPriceTextField;
+    }
+}
