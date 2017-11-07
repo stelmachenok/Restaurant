@@ -4,8 +4,6 @@ import Controller.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import static View.Window.DIMENSION;
 import static View.Window.TAB_AND_BUTTON_FONT;
@@ -13,17 +11,23 @@ import static View.Window.TAB_AND_BUTTON_FONT;
 /**
  * Created by y50-70 on 29.09.2017.
  */
-public class DishPanel extends JPanel{
+public class DishPanel extends JPanel {
     private Window window;
     private DishPanelController controller;
     private JToolBar toolBar;
     private JTabbedPane tabbedPane;
-    private DishEditPanel editDishPanel;
     private boolean isEditModeOn;
     private JButton editButton;
     private JButton closeButton;
     private JButton readyButton;
-    private List<DishPanelListener> listeners;
+
+    public boolean isEditModeOn() {
+        return isEditModeOn;
+    }
+
+    public Window getWindow() {
+        return window;
+    }
 
     public DishPanelController getController() {
         return controller;
@@ -33,33 +37,94 @@ public class DishPanel extends JPanel{
         return tabbedPane;
     }
 
-    public DishEditPanel getEditDishPanel() {
-        return editDishPanel;
-    }
-
-    DishPanel(Window window){
+    DishPanel(Window window) {
         super(new BorderLayout());
         this.window = window;
-        this.listeners = new ArrayList<>();
         createPanel();
         createController();
         createToolBar();
         createTabbedPane();
-        createEditPanel();
-        createSubTypeTabbedPane();
     }
 
-    private void createController(){
+    private void createController() {
         controller = new DishPanelController(this, window);
     }
 
-    private void createEditPanel(){
-        editDishPanel = new DishEditPanel(this);
-        add(editDishPanel, BorderLayout.EAST);
+    private void createTabbedPane() {
+        tabbedPane = new JTabbedPane();
+        tabbedPane.setFont(TAB_AND_BUTTON_FONT);
+        controller.fillingDishList();
+        add(tabbedPane, BorderLayout.CENTER);
     }
 
-    private void createSubTypeTabbedPane() {
-        controller.fillingDishList();
+    private void createPanel() {
+        setSize(DIMENSION);
+        setVisible(true);
+    }
+
+    private void createToolBar() {
+        toolBar = new JToolBar("DishToolBar", JToolBar.HORIZONTAL);
+        createEditButton();
+        createCloseButton();
+        createReadyButton();
+        add(toolBar, BorderLayout.NORTH);
+    }
+
+    private void createEditButton() {
+        DishOrderPanel dishOrderPanel = window.getDishOrderPanel();
+        DishEditPanel dishEditPanel = window.getDishEditPanel();
+
+        editButton = new JButton("Изменить");
+        editButton.setFont(TAB_AND_BUTTON_FONT);
+        editButton.addActionListener(e -> {
+            toolBar.removeAll();
+            toolBar.add(readyButton);
+            remove(dishOrderPanel);
+            add(dishEditPanel, BorderLayout.EAST);
+            if (tabbedPane.getTabCount() > 0) {
+                String tabHeader = tabbedPane.getTitleAt(tabbedPane.getSelectedIndex());
+                dishEditPanel.getTypeTextField().setText(tabHeader);
+            } else {
+                dishEditPanel.getTypeTextField().setText("");
+            }
+            isEditModeOn = true;
+            updateUI();
+        });
+        toolBar.add(editButton);
+    }
+
+    private void createCloseButton() {
+        closeButton = new JButton("Закрыть");
+        closeButton.setFont(TAB_AND_BUTTON_FONT);
+        closeButton.addActionListener(e ->
+                controller.backToSimpleMode());
+        toolBar.add(closeButton);
+    }
+
+    public void addChangeListener(){
+        tabbedPane.addChangeListener(e -> {
+            controller.refreshEditPaneFields();
+        });
+    }
+
+    private void createReadyButton() {
+        DishEditPanel dishEditPanel = window.getDishEditPanel();
+        DishOrderPanel dishOrderPanel = window.getDishOrderPanel();
+        readyButton = new JButton("Готово");
+        readyButton.setFont(TAB_AND_BUTTON_FONT);
+        readyButton.addActionListener(e -> {
+            toolBar.removeAll();
+            toolBar.add(editButton);
+            toolBar.add(closeButton);
+            remove(dishEditPanel);
+            add(dishOrderPanel, BorderLayout.EAST);
+            isEditModeOn = false;
+            updateUI();
+        });
+    }
+}
+
+
 //        JTabbedPane tabbedPane = new JTabbedPane();
 //        tabbedPane.addChangeListener(e -> {
 //            controller.refreshEditPaneFields();
@@ -120,82 +185,18 @@ public class DishPanel extends JPanel{
 //        });
 //        this.tabbedPane.add("Еда", foodTabbedPane);
 
-    }
 
-    private void createTabbedPane() {
-        tabbedPane = new JTabbedPane();
-        tabbedPane.setFont(TAB_AND_BUTTON_FONT);
-        tabbedPane.addChangeListener(e -> {
-            controller.refreshEditPaneFields();
-            for(DishPanelListener l: listeners){
-                l.tableChanged();
-            }
-        });
-        add(tabbedPane, BorderLayout.CENTER);
-    }
+//    JTabbedPane tab = (JTabbedPane) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
+////                JTabbedPane tab = tabbedPane.getComponentAt(tabbedPane.getSelectedIndex()).get(tabHeader);
+//                if (tab != null) {
+//                        String subTypeHeader = tab.getTitleAt(tab.getSelectedIndex()); //todo validation codname "bread"
+//                        dishEditPanel.getSubTypeTextField().setText(subTypeHeader);
+//                        }
+//                        else {
+//                        dishEditPanel.getSubTypeTextField().setText("");
+//                        }
 
-    private void createPanel(){
-        setSize(DIMENSION);
-        setVisible(true);
-    }
 
-    private void createToolBar(){
-        toolBar = new JToolBar("DishToolBar", JToolBar.HORIZONTAL);
-        createEditButton();
-        createCloseButton();
-        createReadyButton();
-        add(toolBar, BorderLayout.NORTH);
-    }
-
-    private void createEditButton(){
-        editButton = new JButton("Изменить");
-        editButton.setFont(TAB_AND_BUTTON_FONT);
-        editButton.addActionListener(e -> {
-            toolBar.removeAll();
-            toolBar.add(readyButton);
-            editDishPanel.setVisible(true);
-            if (tabbedPane.getTabCount() > 0) {
-                String tabHeader = tabbedPane.getTitleAt(tabbedPane.getSelectedIndex());
-                editDishPanel.getTypeTextField().setText(tabHeader);
-                JTabbedPane tab = (JTabbedPane) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
-//                JTabbedPane tab = tabbedPane.getComponentAt(tabbedPane.getSelectedIndex()).get(tabHeader);
-                if (tab != null) {
-                    String subTypeHeader = tab.getTitleAt(tab.getSelectedIndex()); //todo validation codname "bread"
-                    editDishPanel.getSubTypeTextField().setText(subTypeHeader);
-                }
-                else {
-                    editDishPanel.getSubTypeTextField().setText("");
-                }
-            }
-            else{
-                editDishPanel.getTypeTextField().setText("");
-            }
-            isEditModeOn = true;
-        });
-        toolBar.add(editButton);
-    }
-
-    private void createCloseButton(){
-        closeButton = new JButton("Закрыть");
-        closeButton.setFont(TAB_AND_BUTTON_FONT);
-        closeButton.addActionListener(e ->
-                controller.backToSimpleMode());
-        toolBar.add(closeButton);
-    }
-
-    private void createReadyButton(){
-        readyButton = new JButton("Готово");
-        readyButton.setFont(TAB_AND_BUTTON_FONT);
-        readyButton.addActionListener(e -> {
-            toolBar.removeAll();
-            toolBar.add(editButton);
-            toolBar.add(closeButton);
-            isEditModeOn = false;
-            editDishPanel.setVisible(false);
-        });
-    }
-
-    public void addListener(DishPanelListener dishPanelListener) {
-        this.listeners.add(dishPanelListener);
-    }
-}
+//    public void addPanelListener(DishPanelListener dishPanelListener) {
+//        this.listeners.add(dishPanelListener);
+//    }

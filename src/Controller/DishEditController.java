@@ -3,6 +3,7 @@ package Controller;
 import Model.Dish;
 import View.DishEditPanel;
 import View.DishPanel;
+import View.Window;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -13,35 +14,25 @@ import java.awt.*;
  * Created by y50-70 on 12.10.2017.
  */
 public class DishEditController {
-    private JTabbedPane dishTabbedPane;
     private DishEditPanel dishEditPanel;
-    private DishPanel dishPanel;
+    private Window window;
     private Dish selectedDish;
 
-    public DishEditController(DishPanel dishPanel, DishEditPanel dishEditPanel) {
-        this.dishPanel = dishPanel;
+    public DishEditController(Window window, DishEditPanel dishEditPanel) {
+        this.window = window;
         this.dishEditPanel = dishEditPanel;
-        this.dishTabbedPane = this.dishPanel.getTabbedPane();
     }
 
     public void removeType() {
+        JTabbedPane dishTabbedPane = window.getDishPanel().getTabbedPane();
         if (dishTabbedPane.getTabCount() > 0) {
             dishTabbedPane.removeTabAt(dishTabbedPane.getSelectedIndex());
         }
         refreshEditPaneFields();
     }
 
-    public void removeSubType(){
-        if (dishTabbedPane.getTabCount() > 0) {
-            JTabbedPane typeTabbedPane = (JTabbedPane)dishTabbedPane.getComponentAt(dishTabbedPane.getSelectedIndex());
-            if (typeTabbedPane.getTabCount() > 0){
-                typeTabbedPane.removeTabAt(typeTabbedPane.getSelectedIndex());
-            }
-        }
-        refreshEditPaneFields();
-    }
-
     public void changeTypeName() {
+        JTabbedPane dishTabbedPane = window.getDishPanel().getTabbedPane();
         if (dishTabbedPane.getTabCount() > 0) {
             String newTitle = dishEditPanel.getTypeTextField().getText();
             dishTabbedPane.setTitleAt(dishTabbedPane.getSelectedIndex(), newTitle);
@@ -64,33 +55,15 @@ public class DishEditController {
         }
     }
 
-    public void changeSubTypeName() {
-        if (dishTabbedPane.getTabCount() > 0) {
-            JTabbedPane typeTabbedPane = (JTabbedPane) dishTabbedPane.getComponentAt(dishTabbedPane.getSelectedIndex());
-            if (typeTabbedPane.getTabCount() > 0){
-                typeTabbedPane.setTitleAt(typeTabbedPane.getSelectedIndex(), dishEditPanel.getSubTypeTextField().getText());
-            }
-        }
-    }
-
     public void addType() {
-        JTabbedPane subTypetabbedPane = new JTabbedPane();
-        subTypetabbedPane.addChangeListener(e -> {
-            refreshEditPaneFields();
-        });
-        dishTabbedPane.addTab("Новый тип", subTypetabbedPane);
+        JTabbedPane dishTabbedPane = window.getDishPanel().getTabbedPane();
+        dishTabbedPane.addTab("Новый тип", new JPanel(new GridBagLayout()));
         refreshEditPaneFields();
     }
 
-    public void addSubType() {
-        if (dishTabbedPane.getTabCount() > 0) {
-            JTabbedPane typeTabbedPane = (JTabbedPane)dishTabbedPane.getComponentAt(dishTabbedPane.getSelectedIndex());
-            typeTabbedPane.addTab("Новый подтип",  new JPanel(new BorderLayout()));
-            refreshEditPaneFields();
-        }
-    }
-
     public void addDish(){
+        DishPanel dishPanel = window.getDishPanel();
+        JTabbedPane dishTabbedPane = window.getDishPanel().getTabbedPane();
         if (dishTabbedPane.getTabCount() > 0){
             JTabbedPane typeTabbedPane = (JTabbedPane)dishTabbedPane.getComponentAt(dishTabbedPane.getSelectedIndex());
             if (typeTabbedPane.getTabCount() > 0){
@@ -101,15 +74,9 @@ public class DishEditController {
     }
 
     public void refreshEditPaneFields(){
+        JTabbedPane dishTabbedPane = window.getDishPanel().getTabbedPane();
         if (dishTabbedPane.getTabCount() > 0) {
             dishEditPanel.getTypeTextField().setText(dishTabbedPane.getTitleAt(dishTabbedPane.getSelectedIndex()));
-            JTabbedPane typeTabbedPane = (JTabbedPane)dishTabbedPane.getComponentAt(dishTabbedPane.getSelectedIndex());
-            if (typeTabbedPane.getTabCount() > 0){
-                dishEditPanel.getSubTypeTextField().setText(typeTabbedPane.getTitleAt(typeTabbedPane.getSelectedIndex()));
-            }
-            else {
-                dishEditPanel.getSubTypeTextField().setText("");
-            }
         }
         else{
             dishEditPanel.getTypeTextField().setText("");
@@ -130,3 +97,32 @@ public class DishEditController {
         selectedDish = dish;
     }
 }
+
+//    public void removeSubType(){
+//        JTabbedPane dishTabbedPane = window.getDishPanel().getTabbedPane();
+//        if (dishTabbedPane.getTabCount() > 0) {
+//            JTabbedPane typeTabbedPane = (JTabbedPane)dishTabbedPane.getComponentAt(dishTabbedPane.getSelectedIndex());
+//            if (typeTabbedPane.getTabCount() > 0){
+//                typeTabbedPane.removeTabAt(typeTabbedPane.getSelectedIndex());
+//            }
+//        }
+//        refreshEditPaneFields();
+//    }
+
+
+//    public void addSubType() {
+//        if (dishTabbedPane.getTabCount() > 0) {
+//            JTabbedPane typeTabbedPane = (JTabbedPane)dishTabbedPane.getComponentAt(dishTabbedPane.getSelectedIndex());
+//            typeTabbedPane.addTab("Новый подтип",  new JPanel(new BorderLayout()));
+//            refreshEditPaneFields();
+//        }
+//    }
+
+//    public void changeSubTypeName() {
+//        if (dishTabbedPane.getTabCount() > 0) {
+//            JTabbedPane typeTabbedPane = (JTabbedPane) dishTabbedPane.getComponentAt(dishTabbedPane.getSelectedIndex());
+//            if (typeTabbedPane.getTabCount() > 0){
+//                typeTabbedPane.setTitleAt(typeTabbedPane.getSelectedIndex(), dishEditPanel.getSubTypeTextField().getText());
+//            }
+//        }
+//    }

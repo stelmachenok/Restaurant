@@ -12,12 +12,12 @@ public class Window {
     private JFrame frame;
     private JPanel panel;
     private DishPanel dishPanel;
+    private DishEditPanel dishEditPanel;
+    private DishOrderPanel dishOrderPanel;
     private JToolBar toolBar;
     private TableEditPanel tableEditPanel;
     private Controller controller;
     private JTabbedPane tabbedPane;
-//    private JTextField hallNameTextField;
-//    private JTextField tableNameTextField;
     private JButton editButton;
     private JButton exitButton;
     private JButton readyButton;
@@ -32,12 +32,23 @@ public class Window {
         createTabbedPane();
         createEditPanel();
         createToolBar();
+        createDishEditPanel();
+        createDishOrderPanel();
         createDishPanel();
         panel.updateUI();
     }
 
+    private void createDishEditPanel(){
+        dishEditPanel = new DishEditPanel(this);
+    }
+
+    private void createDishOrderPanel(){
+        dishOrderPanel = new DishOrderPanel(this);
+    }
+
     private void createDishPanel(){
         dishPanel = new DishPanel(this);
+        dishPanel.addChangeListener();
     }
 
     private void createController() {
@@ -76,17 +87,12 @@ public class Window {
         tabbedPane.setFont(TAB_AND_BUTTON_FONT);
         tabbedPane.addTab("New Hall", new TableArea(this));
         tabbedPane.addChangeListener(e -> {
-            if (tabbedPane.getTabCount() > 0) {
-                tableEditPanel.getHallNameTextField().setText(tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()));
-            }
-            else{
-                tableEditPanel.getHallNameTextField().setText("");
-            }
+            controller.changeTab();
         });
         panel.add(tabbedPane, BorderLayout.CENTER);
     }
 
-    Controller getController() {
+    public Controller getController() {
         return controller;
     }
 
@@ -103,7 +109,12 @@ public class Window {
     }
 
     public TableArea getCurrentTableArea() {
-        return (TableArea)tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
+        if (tabbedPane.getTabCount() > 0) {
+            return (TableArea) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
+        }
+        else{
+            return null;
+        }
     }
 
     private void createEditButton(){
@@ -149,6 +160,18 @@ public class Window {
         toolBar.add(exitButton);
     }
 
+    public DishEditPanel getDishEditPanel() {
+        return dishEditPanel;
+    }
+
+    public DishOrderPanel getDishOrderPanel() {
+        return dishOrderPanel;
+    }
+
+    public TableEditPanel getTableEditPanel() {
+        return tableEditPanel;
+    }
+
     public JTabbedPane getTabbedPane() {
         return tabbedPane;
     }
@@ -157,3 +180,14 @@ public class Window {
         new Window();
     }
 }
+
+//    private DishPanelListener dishPanelListener;
+//
+//    public void addDishPanelListener(DishPanelListener dishPanelListener){
+//        this.dishPanelListener = dishPanelListener;
+//    }
+//
+//    public DishPanelListener getDishPanelListener() {
+//        return dishPanelListener;
+//    }
+

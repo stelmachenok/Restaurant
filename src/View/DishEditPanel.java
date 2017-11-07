@@ -12,14 +12,13 @@ import static View.Window.*;
 /**
  * Created by y50-70 on 12.10.2017.
  */
-public class DishEditPanel extends AbstractEditPanel {
+public class DishEditPanel extends JPanel {
     private JTextField typeTextField;
-    private JTextField subTypeTextField;
     private JTextField dishNameTextField;
     private JTextField dishPriceTextField;
-//    private JTabbedPane dishTabbedPane;
     private DishEditController controller;
-    private DishPanel dishPanel;
+    private Window window;
+    private GridBagConstraints constraints;
 
     public DishEditController getController() {
         return controller;
@@ -27,10 +26,6 @@ public class DishEditPanel extends AbstractEditPanel {
 
     public JTextField getTypeTextField() {
         return typeTextField;
-    }
-
-    public JTextField getSubTypeTextField() {
-        return subTypeTextField;
     }
 
     public JTextField getDishNameTextField() {
@@ -41,22 +36,21 @@ public class DishEditPanel extends AbstractEditPanel {
         return dishPriceTextField;
     }
 
-//    public JTextField getDishTextField() {
-//        return dishTextField;
-//    }
-
-    DishEditPanel(DishPanel dishPanel) {
-        super(1, 15);
-        this.dishPanel = dishPanel;
+    DishEditPanel(Window window) {
+        super(new GridBagLayout());
+        setVisible(false);
+        initGridBagConstraints();
+        this.window = window;
+        setVisible(true);
 //        this.dishTabbedPane = dishTabbedPane;
-        controller = new DishEditController(dishPanel, this);
-        this.dishPanel.addListener(new DishPanelListener() {
-            @Override
-            public void tableChanged() {
-
-                controller.refreshEditPaneFields();
-            }
-        });
+        controller = new DishEditController(window, this);
+//        this.dishPanel.addPanelListener(new DishPanelListener() {
+//            @Override
+//            public void getTableNameTextField() {
+//
+//                controller.refreshEditPaneFields();
+//            }
+//        });
 
         JLabel label = new JLabel("<html><u>Раздел</u></html>");
         label.setForeground(new Color(225, 0, 25));
@@ -93,38 +87,7 @@ public class DishEditPanel extends AbstractEditPanel {
         add(button, constraints);
         constraints.gridy++;
 
-        label = new JLabel("<html><u>Подраздел</u></html>");
-        label.setForeground(new Color(225, 0, 25));
-        label.setFont(TAB_AND_BUTTON_FONT);
-        add(label, constraints);
-        constraints.gridy++;
 
-        button = new JButton("Добавить");
-        button.addActionListener(e -> {
-            controller.addSubType();
-        });
-        button.setFont(TAB_AND_BUTTON_FONT);
-        add(button, constraints);
-        constraints.gridy++;
-
-        subTypeTextField = new JTextField(10);
-        subTypeTextField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                controller.changeSubTypeName();
-            }
-        });
-        subTypeTextField.setFont(TAB_AND_BUTTON_FONT);
-        add(subTypeTextField, constraints);
-        constraints.gridy++;
-
-        button = new JButton("Удалить");
-        button.addActionListener(e -> {
-            controller.removeSubType();
-        });
-        button.setFont(TAB_AND_BUTTON_FONT);
-        add(button, constraints);
-        constraints.gridy++;
 
         label = new JLabel("<html><u>Блюдо</u></html>");
         label.setForeground(new Color(225, 0, 25));
@@ -177,11 +140,58 @@ public class DishEditPanel extends AbstractEditPanel {
         constraints.gridy++;
 
 
-
         button = new JButton("Удалить");
         button.addActionListener(e -> {
         });
         button.setFont(TAB_AND_BUTTON_FONT);
         add(button, constraints);
     }
+
+    private void initGridBagConstraints() {
+        constraints = new GridBagConstraints();
+        constraints.anchor = GridBagConstraints.CENTER;
+        constraints.fill = GridBagConstraints.CENTER;
+        constraints.gridheight = 1;
+        constraints.gridwidth = 15;
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.insets = new Insets(10, 0, 0, 0);
+        constraints.ipadx = 1;
+        constraints.ipady = 1;
+        constraints.weightx = 0.0;
+        constraints.weighty = 0.0;
+    }
 }
+
+//label = new JLabel("<html><u>Подраздел</u></html>");
+//        label.setForeground(new Color(225, 0, 25));
+//        label.setFont(TAB_AND_BUTTON_FONT);
+//        add(label, constraints);
+//        constraints.gridy++;
+//
+//        button = new JButton("Добавить");
+//        button.addActionListener(e -> {
+//        controller.addSubType();
+//        });
+//        button.setFont(TAB_AND_BUTTON_FONT);
+//        add(button, constraints);
+//        constraints.gridy++;
+//
+//        subTypeTextField = new JTextField(10);
+//        subTypeTextField.addKeyListener(new KeyAdapter() {
+//@Override
+//public void keyReleased(KeyEvent e) {
+//        controller.changeSubTypeName();
+//        }
+//        });
+//        subTypeTextField.setFont(TAB_AND_BUTTON_FONT);
+//        add(subTypeTextField, constraints);
+//        constraints.gridy++;
+//
+//        button = new JButton("Удалить");
+//        button.addActionListener(e -> {
+//        controller.removeSubType();
+//        });
+//        button.setFont(TAB_AND_BUTTON_FONT);
+//        add(button, constraints);
+//        constraints.gridy++;
