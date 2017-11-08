@@ -129,6 +129,7 @@ public class DishEditPanel extends JPanel {
 
         button = new JButton("Удалить");
         button.addActionListener(e -> {
+            controller.removeDish();
         });
         button.setFont(TAB_AND_BUTTON_FONT);
         add(button, constraints);

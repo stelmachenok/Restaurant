@@ -2,6 +2,7 @@ package Controller;
 
 import Model.Dish;
 import Model.Table;
+import View.DishEditPanel;
 import View.DishOrderPanel;
 import View.DishPanel;
 import View.Window;
@@ -11,6 +12,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,20 +23,20 @@ public class DishPanelController {
     private Window window;
     private List<Dish> dishes;
     private GridBagConstraints constraints;
+    private boolean isEditModeOn;
 
     public DishPanelController(DishPanel dishPanel, Window window) {
         this.dishPanel = dishPanel;
         this.window = window;
     }
 
-    public void backToSimpleMode() {
+    public void backToTablePanel() {
         JPanel panel = window.getPanel();
         DishPanel dishPanel = window.getDishPanel();
         window.getFrame().remove(dishPanel);
         window.getFrame().add(panel);
         panel.updateUI();
     }
-
 
     //todo перенети во view, сделать заполнение через xml
     public void fillingDishList() {
@@ -89,21 +91,73 @@ public class DishPanelController {
         dish.setVisible(true);
         JTabbedPane tabbedPane = dishPanel.getTabbedPane();
         if (tabbedPane.getTabCount() > 0) {
-            JTabbedPane typeTabbedPane = (JTabbedPane) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
-            if (typeTabbedPane.getTabCount() > 0) {
-                JPanel dishTypePanel = (JPanel) typeTabbedPane.getComponentAt(typeTabbedPane.getSelectedIndex());
-                dishTypePanel.add(dish, constraints);
-                dish.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        DishEditController dishEditController = window.getDishEditPanel().getController();
-                        dishEditController.setSelectedDish(dish);
-                        dishEditController.refreshEditPaneFields();
-                    }
-                });
-                dishPanel.updateUI();
-            }
+            JPanel dishesPanel = (JPanel) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
+            dishesPanel.add(dish, constraints);
+            dish.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    DishEditController dishEditController = window.getDishEditPanel().getController();
+                    dishEditController.setSelectedDish(dish);
+                    dishEditController.refreshEditPaneFields();
+                    addDishListener(dish);
+                }
+            });
+            this.dishPanel.updateUI();
         }
+    }
+
+    void removeDish(Dish dish) {
+        JTabbedPane tabbedPane = dishPanel.getTabbedPane();
+        if (tabbedPane.getTabCount() > 0) {
+            JPanel dishesPanel = (JPanel) tabbedPane.getComponentAt(tabbedPane.getSelectedIndex());
+            List<Component> components = Arrays.asList(dishesPanel.getComponents());
+            components.forEach((c)->{
+                if (dish.equals(c)){
+                    dishesPanel.remove(c);
+                }
+            });
+        }
+        dishes.remove(dish);
+        dishPanel.updateUI();
+    }
+
+    public void setEditMode() {
+        DishPanel dishPanel = window.getDishPanel();
+        JTabbedPane tabbedPane = dishPanel.getTabbedPane();
+        DishEditPanel dishEditPanel = window.getDishEditPanel();
+        JToolBar toolBar = dishPanel.getToolBar();
+        JButton readyButton = dishPanel.getReadyButton();
+        DishOrderPanel dishOrderPanel = window.getDishOrderPanel();
+
+        toolBar.removeAll();
+        toolBar.add(readyButton);
+        dishPanel.remove(dishOrderPanel);
+        dishPanel.add(dishEditPanel, BorderLayout.EAST);
+        if (tabbedPane.getTabCount() > 0) {
+            String tabHeader = tabbedPane.getTitleAt(tabbedPane.getSelectedIndex());
+            dishEditPanel.getTypeTextField().setText(tabHeader);
+        } else {
+            dishEditPanel.getTypeTextField().setText("");
+        }
+        setEditModeOn(true);
+        dishPanel.updateUI();
+    }
+
+    public void setSimpleMode() {
+        DishPanel dishPanel = window.getDishPanel();
+        DishEditPanel dishEditPanel = window.getDishEditPanel();
+        JToolBar toolBar = dishPanel.getToolBar();
+        DishOrderPanel dishOrderPanel = window.getDishOrderPanel();
+        JButton closeButton = dishPanel.getCloseButton();
+        JButton editButton = dishPanel.getEditButton();
+
+        toolBar.removeAll();
+        toolBar.add(editButton);
+        toolBar.add(closeButton);
+        dishPanel.remove(dishEditPanel);
+        dishPanel.add(dishOrderPanel, BorderLayout.EAST);
+        setEditModeOn(false);
+        dishPanel.updateUI();
     }
 
     private void createGridBagConstraints() {
@@ -125,15 +179,23 @@ public class DishPanelController {
         DishEditController dishEditController = window.getDishEditPanel().getController();
         dishEditController.setSelectedDish(dish);
         dishEditController.refreshEditPaneFields();
-        Table lastSelectedTable = window.getController().getLastSelectedTable();
-        DishOrderPanel dishOrderPanel = window.getDishOrderPanel();
-        dishOrderPanel.getController().addDishToTable(lastSelectedTable, dish);
-        List<Dish> dishes = dishOrderPanel.getController().getDishesFromTable(lastSelectedTable);
-        window.getDishOrderPanel().getOrderDishesPanel().removeAll();
-        dishes.forEach((d) -> {
-            window.getDishOrderPanel().getController().addDishToDisplay(lastSelectedTable, d);
-        });
+        if (!isEditModeOn()) {
+            Table lastSelectedTable = window.getController().getLastSelectedTable();
+            DishOrderPanel dishOrderPanel = window.getDishOrderPanel();
+            dishOrderPanel.getController().addDishToTable(lastSelectedTable, dish);
+
+            DishOrderController dishOrderController = window.getDishOrderPanel().getController();
+            dishOrderController.refreshOrderNames();
+        }
 
         dishPanel.updateUI();
+    }
+
+    private boolean isEditModeOn() {
+        return isEditModeOn;
+    }
+
+    private void setEditModeOn(boolean editModeOn) {
+        isEditModeOn = editModeOn;
     }
 }

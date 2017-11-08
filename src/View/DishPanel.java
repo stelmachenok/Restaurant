@@ -16,7 +16,6 @@ public class DishPanel extends JPanel {
     private DishPanelController controller;
     private JToolBar toolBar;
     private JTabbedPane tabbedPane;
-    private boolean isEditModeOn;
     private JButton editButton;
     private JButton closeButton;
     private JButton readyButton;
@@ -56,24 +55,10 @@ public class DishPanel extends JPanel {
     }
 
     private void createEditButton() {
-        DishOrderPanel dishOrderPanel = window.getDishOrderPanel();
-        DishEditPanel dishEditPanel = window.getDishEditPanel();
-
         editButton = new JButton("Изменить");
         editButton.setFont(TAB_AND_BUTTON_FONT);
         editButton.addActionListener(e -> {
-            toolBar.removeAll();
-            toolBar.add(readyButton);
-            remove(dishOrderPanel);
-            add(dishEditPanel, BorderLayout.EAST);
-            if (tabbedPane.getTabCount() > 0) {
-                String tabHeader = tabbedPane.getTitleAt(tabbedPane.getSelectedIndex());
-                dishEditPanel.getTypeTextField().setText(tabHeader);
-            } else {
-                dishEditPanel.getTypeTextField().setText("");
-            }
-            isEditModeOn = true;
-            updateUI();
+            controller.setEditMode();
         });
         toolBar.add(editButton);
     }
@@ -82,23 +67,15 @@ public class DishPanel extends JPanel {
         closeButton = new JButton("Закрыть");
         closeButton.setFont(TAB_AND_BUTTON_FONT);
         closeButton.addActionListener(e ->
-                controller.backToSimpleMode());
+                controller.backToTablePanel());
         toolBar.add(closeButton);
     }
 
     private void createReadyButton() {
-        DishEditPanel dishEditPanel = window.getDishEditPanel();
-        DishOrderPanel dishOrderPanel = window.getDishOrderPanel();
         readyButton = new JButton("Готово");
         readyButton.setFont(TAB_AND_BUTTON_FONT);
         readyButton.addActionListener(e -> {
-            toolBar.removeAll();
-            toolBar.add(editButton);
-            toolBar.add(closeButton);
-            remove(dishEditPanel);
-            add(dishOrderPanel, BorderLayout.EAST);
-            isEditModeOn = false;
-            updateUI();
+            controller.setSimpleMode();
         });
     }
 
@@ -106,10 +83,6 @@ public class DishPanel extends JPanel {
         tabbedPane.addChangeListener(e -> {
             window.getDishEditPanel().getController().refreshEditPaneFields();
         });
-    }
-
-    public boolean isEditModeOn() {
-        return isEditModeOn;
     }
 
     public Window getWindow() {
@@ -122,5 +95,21 @@ public class DishPanel extends JPanel {
 
     public JTabbedPane getTabbedPane() {
         return tabbedPane;
+    }
+
+    public JToolBar getToolBar() {
+        return toolBar;
+    }
+
+    public JButton getEditButton() {
+        return editButton;
+    }
+
+    public JButton getCloseButton() {
+        return closeButton;
+    }
+
+    public JButton getReadyButton() {
+        return readyButton;
     }
 }

@@ -6,7 +6,6 @@ import View.TableArea;
 import View.Window;
 
 import javax.swing.*;
-import java.util.List;
 
 /**
  * Created by y50-70 on 12.10.2017.
@@ -22,7 +21,7 @@ public class TableEditController {
         Table table = new Table();
         Point point = new Point(xCoord, yCoord);
         TableArea tableArea = window.getCurrentTableArea();
-        window.getController().addTableToMap(tableArea, table);
+        window.getController().addTableToTableArea(tableArea, table);
         window.getController().setTableCoord(table, point);
         window.getDishOrderPanel().getController().addTableToMap(table);
         window.getController().setOrderDone(table, false);
@@ -36,7 +35,7 @@ public class TableEditController {
 
         Table table = window.getController().getSelectedTable();
         if (table != null) {
-            window.getController().removeFromMap(tableArea, table);
+            window.getController().removeTableFromTableArea(tableArea, table);
         }
         tableArea.repaint();
     }

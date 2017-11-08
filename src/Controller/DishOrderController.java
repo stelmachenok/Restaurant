@@ -37,6 +37,15 @@ public class DishOrderController {
         selectedTableNameLabel.setText("<html><u>Стол: " + table.getTableName()+ "</u></html>");
     }
 
+    void refreshOrderNames(){
+        Table lastSelectedTable = window.getController().getLastSelectedTable();
+        List<Dish> dishes = getDishesFromTable(lastSelectedTable);
+        dishOrderPanel.getOrderDishesPanel().removeAll();
+        dishes.forEach((d) -> {
+            dishOrderPanel.getController().addDishToDisplay(lastSelectedTable, d);
+        });
+    }
+
     void addDishToTable(Table table, Dish dish){
         tableToDishesMap.get(table).add(dish);
     }

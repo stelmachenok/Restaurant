@@ -55,40 +55,6 @@ public class Controller {
         tableArea.repaint();
     }
 
-    public Table getSelectedTable() {
-        return selectedTable;
-    }
-
-    private Table getSelectedTable(int xCoord, int yCoord) {
-        TableArea tableArea = window.getCurrentTableArea();
-        List<Table> tables = tabToTablesMap.get(tableArea);
-        if (tables == null) {
-            selectedTable = null;
-            return null;
-        }
-        selectedTable = null;
-        if (!tableCord.isEmpty() && !tables.isEmpty()) {
-            int firstX = tableCord.get(tables.get(0)).getX();
-            int firstY = tableCord.get(tables.get(0)).getY();
-
-            double minDistance = Math.hypot(firstX - xCoord, firstY - yCoord);
-            if (minDistance < Table.WIDTH) {
-                selectedTable = tables.get(0);
-            }
-
-            for (Table table : tables) {
-                int x = tableCord.get(table).getX();
-                int y = tableCord.get(table).getY();
-                double distance = Math.hypot(x - xCoord, y - yCoord);
-                if (distance < minDistance && distance < Table.WIDTH) {
-                    minDistance = distance;
-                    selectedTable = table;
-                }
-            }
-        }
-        return selectedTable;
-    }
-
     public void selectTableOnEditMode(MouseEvent e) {
         int xCoord = e.getX();
         int yCoord = e.getY();
@@ -143,10 +109,6 @@ public class Controller {
         }
     }
 
-    public Table getLastSelectedTable() {
-        return lastSelectedTable;
-    }
-
     public void moveTable(MouseEvent e) {
         int xCoord = e.getX();
         int yCoord = e.getY();
@@ -157,38 +119,76 @@ public class Controller {
         tableArea.repaint();
     }
 
-    public void addTableToMap(TableArea tab, Table table) {
+    void addTableToTableArea(TableArea tab, Table table) {
         tabToTablesMap.get(tab).add(table);
+    }
+
+    void removeTableFromTableArea(TableArea tab, Table table) {
+        List<Table> tables = tabToTablesMap.get(tab);
+        tables.remove(table);
+
     }
 
     public void addTableAreaToMap(TableArea tableArea) {
         tabToTablesMap.put(tableArea, new ArrayList<>());
     }
 
-    public void removeFromMap(TableArea tab, Table table) {
-        List<Table> tables = tabToTablesMap.get(tab);
-        tables.remove(table);
+    public Point getTableCoord(Table table) {
+        return tableCord.get(table);
+    }
 
+    void setTableCoord(Table table, Point point) {
+        tableCord.remove(table);
+        tableCord.put(table, point);
     }
 
     public List<Table> getTablesFromTab(TableArea tab) {
         return tabToTablesMap.get(tab);
     }
 
-    public Point getTableCoord(Table table) {
-        return tableCord.get(table);
+    public Table getLastSelectedTable() {
+        return lastSelectedTable;
     }
 
-    public void setTableCoord(Table table, Point point) {
-        tableCord.remove(table);
-        tableCord.put(table, point);
+    public Table getSelectedTable() {
+        return selectedTable;
     }
 
-    public void setOrderDone(Table table, boolean isDone) {
-        isOrderDone.put(table, isDone);
+    private Table getSelectedTable(int xCoord, int yCoord) {
+        TableArea tableArea = window.getCurrentTableArea();
+        List<Table> tables = tabToTablesMap.get(tableArea);
+        if (tables == null) {
+            selectedTable = null;
+            return null;
+        }
+        selectedTable = null;
+        if (!tableCord.isEmpty() && !tables.isEmpty()) {
+            int firstX = tableCord.get(tables.get(0)).getX();
+            int firstY = tableCord.get(tables.get(0)).getY();
+
+            double minDistance = Math.hypot(firstX - xCoord, firstY - yCoord);
+            if (minDistance < Table.WIDTH) {
+                selectedTable = tables.get(0);
+            }
+
+            for (Table table : tables) {
+                int x = tableCord.get(table).getX();
+                int y = tableCord.get(table).getY();
+                double distance = Math.hypot(x - xCoord, y - yCoord);
+                if (distance < minDistance && distance < Table.WIDTH) {
+                    minDistance = distance;
+                    selectedTable = table;
+                }
+            }
+        }
+        return selectedTable;
     }
 
     public boolean isOrderDone(Table table) {
         return isOrderDone.get(table);
+    }
+
+    public void setOrderDone(Table table, boolean isDone) {
+        isOrderDone.put(table, isDone);
     }
 }

@@ -7,6 +7,8 @@ import View.Window;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * Created by y50-70 on 12.10.2017.
@@ -21,11 +23,18 @@ public class DishEditController {
         this.dishEditPanel = dishEditPanel;
     }
 
-    public void removeType() {
+    public void addType() {
         JTabbedPane dishTabbedPane = window.getDishPanel().getTabbedPane();
-        if (dishTabbedPane.getTabCount() > 0) {
-            dishTabbedPane.removeTabAt(dishTabbedPane.getSelectedIndex());
-        }
+        JPanel dishPanel = new JPanel(new GridBagLayout());
+        dishPanel.setVisible(true);
+        dishPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                setSelectedDish(null);
+                refreshEditPaneFields();
+            }
+        });
+        dishTabbedPane.addTab("Новый тип", dishPanel);
         refreshEditPaneFields();
     }
 
@@ -37,61 +46,66 @@ public class DishEditController {
         }
     }
 
+    public void removeType() {
+        JTabbedPane dishTabbedPane = window.getDishPanel().getTabbedPane();
+        if (dishTabbedPane.getTabCount() > 0) {
+            dishTabbedPane.removeTabAt(dishTabbedPane.getSelectedIndex());
+        }
+        refreshEditPaneFields();
+    }
+
+    public void addDish() {
+        DishPanel dishPanel = window.getDishPanel();
+        JTabbedPane dishTabbedPane = dishPanel.getTabbedPane();
+        if (dishTabbedPane.getTabCount() > 0) {
+            DishPanelController dishPanelController = dishPanel.getController();
+            dishPanelController.addDish();
+        }
+    }
+
     public void changeDishName() {
         if (selectedDish != null) {
             selectedDish.setDishName(dishEditPanel.getDishNameTextField().getText());
+            window.getDishOrderPanel().getController().refreshOrderNames();
         }
     }
 
     public void changeDishPrice() {
         if (selectedDish != null) {
-            try{
-            selectedDish.setPrice(Integer.valueOf(dishEditPanel.getDishPriceTextField().getText()));
-            }
-            catch (NumberFormatException ignored){
+            try {
+                selectedDish.setPrice(Integer.valueOf(dishEditPanel.getDishPriceTextField().getText()));
+                window.getDishOrderPanel().getController().refreshOrderNames();
+            } catch (NumberFormatException ignored) {
             }
         }
     }
 
-    public void addType() {
-        JTabbedPane dishTabbedPane = window.getDishPanel().getTabbedPane();
-        dishTabbedPane.addTab("Новый тип", new JPanel(new GridBagLayout()));
-        refreshEditPaneFields();
-    }
-
-    public void addDish(){
+    public void removeDish() {
         DishPanel dishPanel = window.getDishPanel();
-        JTabbedPane dishTabbedPane = window.getDishPanel().getTabbedPane();
-        if (dishTabbedPane.getTabCount() > 0){
-            JTabbedPane typeTabbedPane = (JTabbedPane)dishTabbedPane.getComponentAt(dishTabbedPane.getSelectedIndex());
-            if (typeTabbedPane.getTabCount() > 0){
-                DishPanelController dishPanelController = dishPanel.getController();
-                dishPanelController.addDish();
-            }
+        if (selectedDish != null) {
+            dishPanel.getController().removeDish(selectedDish);
         }
     }
 
-    public void refreshEditPaneFields(){
+    public void refreshEditPaneFields() {
         JTabbedPane dishTabbedPane = window.getDishPanel().getTabbedPane();
         if (dishTabbedPane.getTabCount() > 0) {
             dishEditPanel.getTypeTextField().setText(dishTabbedPane.getTitleAt(dishTabbedPane.getSelectedIndex()));
-        }
-        else{
+        } else {
             dishEditPanel.getTypeTextField().setText("");
         }
 
-        if (selectedDish != null){
+        if (selectedDish != null) {
             dishEditPanel.getDishNameTextField().setText(selectedDish.getDishName());
             dishEditPanel.getDishPriceTextField().setText(String.valueOf(selectedDish.getPrice()));
-        }
-        else{
+        } else {
             dishEditPanel.getDishNameTextField().setText("");
             dishEditPanel.getDishPriceTextField().setText("");
         }
 
     }
 
-    public void setSelectedDish(Dish dish){
+    public void setSelectedDish(Dish dish) {
         selectedDish = dish;
     }
 }

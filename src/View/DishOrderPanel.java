@@ -76,7 +76,7 @@ public class DishOrderPanel extends JPanel {
         button = new JButton("Оформить заказ");
         button.addActionListener(e -> {
             DishPanel dishPanel = this.window.getDishPanel();
-            dishPanel.getController().backToSimpleMode();
+            dishPanel.getController().backToTablePanel();
             Table lastSelectedTable = dishPanel.getWindow().getCurrentTableArea().getLastSelectedTable();
             window.getController().setOrderDone(lastSelectedTable, true);
             orderDishesPanel.removeAll();
@@ -97,7 +97,7 @@ public class DishOrderPanel extends JPanel {
             List<Dish> dishes = window.getDishOrderPanel().getController().getDishesFromTable(lastSelectedTable);
             CheckPrinter.printCheck(tableName, dishes);
             window.getController().setOrderDone(lastSelectedTable, false);
-            dishPanel.getController().backToSimpleMode();
+            dishPanel.getController().backToTablePanel();
             window.getDishOrderPanel().getController().removeDishes(lastSelectedTable);
             orderDishesPanel.removeAll();
         });

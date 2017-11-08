@@ -6,7 +6,6 @@ import java.util.UUID;
  * Created by y50-70 on 02.09.2017.
  */
 public class Table {
-
     private String tableName;
     private UUID id;
     public static final int WIDTH = 50;
